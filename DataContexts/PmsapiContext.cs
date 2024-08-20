@@ -209,6 +209,7 @@ public partial class PmsapiContext : DbContext
                 entity.ToTable("users");
 
                 entity.HasIndex(e => e.RoleId, "role_id");
+                entity.HasIndex(e => e.Email, "email").IsUnique();
 
                 entity.Property(e => e.UserId)
                     .HasColumnType("int(11)")
@@ -232,10 +233,10 @@ public partial class PmsapiContext : DbContext
                     .HasMaxLength(50)
                     .HasColumnName("username");
 
-                entity.HasOne(d => d.Role).WithMany(p => p.Users)
-                    .HasForeignKey(d => d.RoleId)
-                    .OnDelete(DeleteBehavior.ClientSetNull)
-                    .HasConstraintName("users_ibfk_1");
+                // entity.HasOne(d => d.Role).WithMany(p => p.Users)
+                //     .HasForeignKey(d => d.RoleId)
+                //     .OnDelete(DeleteBehavior.ClientSetNull)
+                //     .HasConstraintName("users_ibfk_1");
             });
             modelBuilder.Entity<Status>(entity =>
             {
