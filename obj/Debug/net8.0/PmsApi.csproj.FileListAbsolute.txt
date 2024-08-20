@@ -102,3 +102,4 @@ C:\Users\alero\Desktop\PmsApi\obj\Debug\net8.0\refint\PmsApi.dll
 C:\Users\alero\Desktop\PmsApi\obj\Debug\net8.0\PmsApi.pdb
 C:\Users\alero\Desktop\PmsApi\obj\Debug\net8.0\PmsApi.genruntimeconfig.cache
 C:\Users\alero\Desktop\PmsApi\obj\Debug\net8.0\ref\PmsApi.dll
+C:\Users\alero\Desktop\PmsApi\obj\Debug\net8.0\PmsApi.sourcelink.json

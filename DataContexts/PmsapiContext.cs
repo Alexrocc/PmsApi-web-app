@@ -30,9 +30,9 @@ public partial class PmsapiContext : DbContext
 
     public virtual DbSet<Priority> Priorities { get; set; }
 
-    protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
+    // protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
 
-        => optionsBuilder.UseMySql("server=localhost;port=3306;database=pmsapi2;user=root;password=mariam", Microsoft.EntityFrameworkCore.ServerVersion.Parse("11.4.2-mariadb"));
+    //     => optionsBuilder.UseMySql(connectionString, Microsoft.EntityFrameworkCore.ServerVersion.Parse("11.4.2-mariadb"));
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
