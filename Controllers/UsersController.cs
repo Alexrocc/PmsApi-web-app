@@ -1,4 +1,5 @@
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.EntityFrameworkCore;
 using PmsApi.DataContexts;
 using PmsApi.Models;
 
@@ -16,11 +17,20 @@ public class UsersController : ControllerBase
         _context = context;
     }
 
+    [HttpGet]
+    public async Task<ActionResult<List<User>>> GetUsers()
+    {
+        var userList = await _context.Users.ToListAsync();
+
+        return Ok(userList);
+    }
+
+
 
     [HttpGet("{id:int}")]
-    public IActionResult GetUser(int id)
+    public async Task<ActionResult<User>> GetUser(int id)
     {
-        User? user = _context.Users.FirstOrDefault(u => u.UserId == id);
+        User? user = await _context.Users.FirstOrDefaultAsync(u => u.UserId == id);
         if (user is null)
         {
             return NotFound();
