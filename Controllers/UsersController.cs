@@ -17,10 +17,15 @@ public class UsersController : ControllerBase
     }
 
 
-    [HttpGet]
-    public List<User> GetUsers()
+    [HttpGet("{id:int}")]
+    public IActionResult GetUser(int id)
     {
-        return _context.Users.ToList();
+        User? user = _context.Users.FirstOrDefault(u => u.UserId == id);
+        if (user is null)
+        {
+            return NotFound();
+        }
+        return Ok(user);
     }
 }
 

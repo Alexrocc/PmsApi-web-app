@@ -204,13 +204,13 @@ public partial class PmsapiContext : DbContext
 
             modelBuilder.Entity<User>(entity =>
             {
-                entity.HasKey(e => e.Id).HasName("PRIMARY");
+                entity.HasKey(e => e.UserId).HasName("PRIMARY");
 
                 entity.ToTable("users");
 
                 entity.HasIndex(e => e.RoleId, "role_id");
 
-                entity.Property(e => e.Id)
+                entity.Property(e => e.UserId)
                     .HasColumnType("int(11)")
                     .HasColumnName("id");
                 entity.Property(e => e.Email)
