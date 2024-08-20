@@ -3,6 +3,7 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using MySqlConnector;
 using PmsApi.DataContexts;
+using PmsApi.DTOs;
 using PmsApi.Models;
 
 namespace PmsApi.Controllers;
@@ -39,8 +40,23 @@ public class UsersController : ControllerBase
     }
 
     [HttpPost]
-    public async Task<ActionResult> CreateUser(User user)
+    public async Task<ActionResult> CreateUser(CreateUserDto userDto)
     {
+        if (!ModelState.IsValid)
+        {
+            return BadRequest(ModelState);
+        }
+
+        var user = new User
+        {
+            Username = userDto.UserName,
+            FirstName = userDto.FirstName,
+            LastName = userDto.Lastname,
+            Email = userDto.Email,
+            RoleId = userDto.RoleId
+        };
+
+
         try
         {
             _context.Users.Add(user);
@@ -49,12 +65,10 @@ public class UsersController : ControllerBase
             return CreatedAtAction(nameof(GetUser), new { id = user.UserId }, user);
         }
         catch (DbUpdateException ex)
+        when (ex.InnerException is MySqlException mySqlException
+        && mySqlException.Number == 1062)
         {
-            return BadRequest(ex.Message);
-        }
-        catch (MySqlException ex)
-        {
-            return BadRequest(ex.Message);
+            return BadRequest("Email already exists.");
         }
         catch (Exception ex)
         {
