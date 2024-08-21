@@ -106,4 +106,19 @@ public class UsersController : ControllerBase
             return StatusCode(500, ex.Message);
         }
     }
+
+    [HttpDelete]
+    public async Task<ActionResult> DeleteUser(int userId)
+    {
+        User? user = await _context.Users.FindAsync(userId);
+
+        if (user == null)
+        {
+            return NotFound($"Could not find the user with ID {userId}.");
+        }
+
+        _context.Users.Remove(user);
+        await _context.SaveChangesAsync();
+        return NoContent();
+    }
 }
