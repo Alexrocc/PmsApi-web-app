@@ -21,7 +21,7 @@ public class UsersController : ControllerBase
     }
 
     [HttpGet]
-    public async Task<ActionResult<List<User>>> GetUsers([FromQuery] string include = "")
+    public async Task<ActionResult<List<UserDto>>> GetUsers([FromQuery] string include = "")
     {
         var usersQuery = _context.Users.AsQueryable();      //dynamic query for including dependend data
         if (include.Contains("projects", StringComparison.OrdinalIgnoreCase))
