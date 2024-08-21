@@ -8,6 +8,7 @@ var connString = builder.Configuration.GetConnectionString("PmsContext");
 builder.Services.AddDbContext<PmsapiContext>(opt =>
 opt.UseMySql(connString, ServerVersion.AutoDetect(connString)));
 
+builder.Services.AddAutoMapper(typeof(Program));
 builder.Services.AddControllers();
 // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
 builder.Services.AddEndpointsApiExplorer();

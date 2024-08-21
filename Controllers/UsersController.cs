@@ -1,4 +1,4 @@
-using System.Data.Common;
+using AutoMapper;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using MySqlConnector;
@@ -8,16 +8,16 @@ using PmsApi.Models;
 
 namespace PmsApi.Controllers;
 
-
 [ApiController]                 //needed to define the controller
 [Route("api/users")]
 public class UsersController : ControllerBase
 {
-
     private readonly PmsapiContext _context;
-    public UsersController(PmsapiContext context)
+    private readonly IMapper _mapper;
+    public UsersController(PmsapiContext context, IMapper mapper)
     {
         _context = context;
+        _mapper = mapper;
     }
 
     [HttpGet]
@@ -40,21 +40,15 @@ public class UsersController : ControllerBase
     }
 
     [HttpPost]
-    public async Task<ActionResult> UpdateUser(UpdateUserDto userDto)
+    public async Task<ActionResult> CreateUser(CreateUserDto userDto)
     {
         if (!ModelState.IsValid)
         {
             return BadRequest(ModelState);
         }
 
-        var user = new User
-        {
-            Username = userDto.UserName,
-            FirstName = userDto.FirstName,
-            LastName = userDto.Lastname,
-            Email = userDto.Email,
-            RoleId = userDto.RoleId
-        };
+        var user = _mapper.Map<User>(userDto);
+
         try
         {
             _context.Users.Add(user);
@@ -75,7 +69,7 @@ public class UsersController : ControllerBase
     }
 
     [HttpPatch("{userId:int}")]
-    public async Task<ActionResult> CreateUser([FromRoute] int userId, [FromBody] CreateUserDto userDto)   //[FromBody] is not necessary for POST and PUT calls, since it is implicitly understood by Entity
+    public async Task<ActionResult> UpdateUser([FromRoute] int userId, [FromBody] UpdateUserDto userDto) //[FromBody] is not necessary for POST and PUT calls, since it is implicitly understood by Entity
     {
         if (!ModelState.IsValid)
         {
@@ -113,5 +107,3 @@ public class UsersController : ControllerBase
         }
     }
 }
-
-

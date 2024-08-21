@@ -103,3 +103,5 @@ C:\Users\alero\Desktop\PmsApi\obj\Debug\net8.0\PmsApi.pdb
 C:\Users\alero\Desktop\PmsApi\obj\Debug\net8.0\PmsApi.genruntimeconfig.cache
 C:\Users\alero\Desktop\PmsApi\obj\Debug\net8.0\ref\PmsApi.dll
 C:\Users\alero\Desktop\PmsApi\obj\Debug\net8.0\PmsApi.sourcelink.json
+C:\Users\alero\Desktop\PmsApi\bin\Debug\net8.0\AutoMapper.dll
+C:\Users\alero\Desktop\PmsApi\bin\Debug\net8.0\AutoMapper.Extensions.Microsoft.DependencyInjection.dll
