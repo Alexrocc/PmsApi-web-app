@@ -40,7 +40,7 @@ public class UsersController : ControllerBase
     }
 
     [HttpPost]
-    public async Task<ActionResult> CreateUser(CreateUserDto userDto)
+    public async Task<ActionResult> UpdateUser(UpdateUserDto userDto)
     {
         if (!ModelState.IsValid)
         {
@@ -55,14 +55,51 @@ public class UsersController : ControllerBase
             Email = userDto.Email,
             RoleId = userDto.RoleId
         };
-
-
         try
         {
             _context.Users.Add(user);
             await _context.SaveChangesAsync();
             // api/users/{newId} ---> CreatedAtAction() returns the new URL for the resource
             return CreatedAtAction(nameof(GetUser), new { id = user.UserId }, user);
+        }
+        catch (DbUpdateException ex)
+        when (ex.InnerException is MySqlException mySqlException
+        && mySqlException.Number == 1062)
+        {
+            return BadRequest("Email already exists.");
+        }
+        catch (Exception ex)
+        {
+            return StatusCode(500, ex.Message);
+        }
+    }
+
+    [HttpPatch("{userId:int}")]
+    public async Task<ActionResult> CreateUser([FromRoute] int userId, [FromBody] CreateUserDto userDto)   //[FromBody] is not necessary for POST and PUT calls, since it is implicitly understood by Entity
+    {
+        if (!ModelState.IsValid)
+        {
+            return BadRequest(ModelState);
+        }
+
+        User? user = await _context.Users.FindAsync(userId);
+
+        if (user is null)
+        {
+            return NotFound($"The user with the id {userId} could not be found.");
+        }
+
+        user.Username = userDto.UserName;
+        user.Email = userDto.Email;
+        user.FirstName = userDto.FirstName;
+        user.LastName = userDto.Lastname;
+        user.RoleId = userDto.RoleId;
+
+        try
+        {
+            await _context.SaveChangesAsync();
+            // api/users/{newId} ---> CreatedAtAction() returns the new URL for the resource
+            return Ok();
         }
         catch (DbUpdateException ex)
         when (ex.InnerException is MySqlException mySqlException
