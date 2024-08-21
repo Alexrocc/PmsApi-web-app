@@ -116,9 +116,20 @@ public class UsersController : ControllerBase
         {
             return NotFound($"Could not find the user with ID {userId}.");
         }
-
-        _context.Users.Remove(user);
-        await _context.SaveChangesAsync();
-        return NoContent();
+        try
+        {
+            _context.Users.Remove(user);
+            await _context.SaveChangesAsync();
+            return NoContent();
+        }
+        catch (DbUpdateException ex)
+        when (ex.InnerException is MySqlException)
+        {
+            return BadRequest("The user has other records. Please delete assigned tasks.");
+        }
+        catch (Exception)
+        {
+            return StatusCode(500, "An internal error has occoured.");
+        }
     }
 }
