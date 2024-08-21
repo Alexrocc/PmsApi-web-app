@@ -43,7 +43,7 @@ public partial class PmsapiContext : DbContext
         {
             modelBuilder.Entity<Project>(entity =>
             {
-                entity.HasKey(e => e.Id).HasName("PRIMARY");
+                entity.HasKey(e => e.ProjectId).HasName("PRIMARY");
 
                 entity.ToTable("projects");
 
@@ -54,9 +54,9 @@ public partial class PmsapiContext : DbContext
                 entity.HasIndex(e => e.StatusId, "status_id");
 
                 entity.HasIndex(e => e.PriorityId, "priority_id");
-                entity.HasIndex(e => e.Name).IsUnique();
+                entity.HasIndex(e => e.ProjectName).IsUnique();
 
-                entity.Property(e => e.Id)
+                entity.Property(e => e.ProjectId)
                     .HasColumnType("int(11)")
                     .HasColumnName("id");
                 entity.Property(e => e.Description)
@@ -64,7 +64,7 @@ public partial class PmsapiContext : DbContext
                     .HasColumnName("description");
                 entity.Property(e => e.EndDate)
                     .HasColumnName("end_date").IsRequired();
-                entity.Property(e => e.Name)
+                entity.Property(e => e.ProjectName)
                     .HasMaxLength(100)
                     .HasColumnName("name");
                 entity.Property(e => e.ProjectCategoriesId)
@@ -121,7 +121,7 @@ public partial class PmsapiContext : DbContext
 
             modelBuilder.Entity<Models.Task>(entity =>
             {
-                entity.HasKey(e => e.Id).HasName("PRIMARY");
+                entity.HasKey(e => e.TaskId).HasName("PRIMARY");
 
                 entity.ToTable("tasks");
 
@@ -133,7 +133,7 @@ public partial class PmsapiContext : DbContext
 
                 entity.HasIndex(e => e.PriorityId, "priority_id");
 
-                entity.Property(e => e.Id)
+                entity.Property(e => e.TaskId)
                     .HasColumnType("int(11)")
                     .HasColumnName("id");
                 entity.Property(e => e.Description)

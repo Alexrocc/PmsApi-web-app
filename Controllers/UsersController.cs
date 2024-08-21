@@ -21,11 +21,22 @@ public class UsersController : ControllerBase
     }
 
     [HttpGet]
-    public async Task<ActionResult<List<User>>> GetUsers()
+    public async Task<ActionResult<List<User>>> GetUsers([FromQuery] string include = "")
     {
-        var userList = await _context.Users.ToListAsync();
+        var usersQuery = _context.Users.AsQueryable();      //dynamic query for including dependend data
+        if (include.Contains("projects", StringComparison.OrdinalIgnoreCase))
+        {
+            usersQuery = usersQuery.Include(u => u.Projects);
+        }
+        if (include.Contains("tasks", StringComparison.OrdinalIgnoreCase))
+        {
+            usersQuery = usersQuery.Include(u => u.Tasks);
+        }
 
-        return Ok(userList);
+        var users = await usersQuery.ToListAsync();
+        var usersDto = _mapper.Map<IEnumerable<UserDto>>(users);
+
+        return Ok(users);
     }
 
     [HttpGet("{id:int}")]
@@ -53,8 +64,9 @@ public class UsersController : ControllerBase
         {
             _context.Users.Add(user);
             await _context.SaveChangesAsync();
+            var newUserDto = _mapper.Map<User>(userDto);
             // api/users/{newId} ---> CreatedAtAction() returns the new URL for the resource
-            return CreatedAtAction(nameof(GetUser), new { id = user.UserId }, user);
+            return CreatedAtAction(nameof(GetUser), new { id = user.UserId }, newUserDto);
         }
         catch (DbUpdateException ex)
         when (ex.InnerException is MySqlException mySqlException

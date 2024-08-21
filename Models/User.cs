@@ -9,7 +9,7 @@ public partial class User
     public string Password { get; set; } = null!;
     public string Email { get; set; } = null!;
     public int RoleId { get; set; }
-    public virtual ICollection<Project> Projects { get; set; } = new List<Project>();
-    public virtual Role? Role { get; set; }
-    public virtual ICollection<Task> Tasks { get; set; } = new List<Task>();
+    public ICollection<Project> Projects { get; set; } = new List<Project>();
+    public Role? Role { get; set; }
+    public ICollection<Task> Tasks { get; set; } = new List<Task>();
 }
