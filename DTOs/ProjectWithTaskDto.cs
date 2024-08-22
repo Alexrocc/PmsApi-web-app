@@ -16,5 +16,9 @@ public record ProjectWithTaskDto
 
      int UsersManagerId,
 
-     ICollection<TaskDto>? Tasks
+     ICollection<TaskDto>? Tasks,
+
+     ManagerDto Manager,
+
+     CategoryDto ProjectCategory
 );

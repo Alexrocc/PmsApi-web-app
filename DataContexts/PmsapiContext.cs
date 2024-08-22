@@ -93,14 +93,14 @@ public partial class PmsapiContext : DbContext
 
             modelBuilder.Entity<ProjectCategory>(entity =>
             {
-                entity.HasKey(e => e.Id).HasName("PRIMARY");
+                entity.HasKey(e => e.CategoryId).HasName("PRIMARY");
 
                 entity.ToTable("project_categories");
 
-                entity.Property(e => e.Id)
+                entity.Property(e => e.CategoryId)
                     .HasColumnType("int(11)")
                     .HasColumnName("id");
-                entity.Property(e => e.Name)
+                entity.Property(e => e.CategoryName)
                     .HasMaxLength(100)
                     .HasColumnName("name");
             });
