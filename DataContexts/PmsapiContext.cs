@@ -82,7 +82,7 @@ public partial class PmsapiContext : DbContext
                     .HasColumnType("int(11)")
                     .HasColumnName("priority_id");
 
-                entity.HasOne(d => d.ProjectCategories).WithMany(p => p.Projects)
+                entity.HasOne(d => d.ProjectCategory).WithMany(p => p.Projects)
                     .HasForeignKey(d => d.ProjectCategoriesId).IsRequired()
                     .HasConstraintName("projects_ibfk_1");
 

@@ -13,7 +13,7 @@ public partial class Project
     public DateOnly? EndDate { get; set; }
     public int ProjectCategoriesId { get; set; }
     public int UsersManagerId { get; set; }
-    public virtual ProjectCategory? ProjectCategories { get; set; }
-    public virtual ICollection<Task> Tasks { get; set; } = new List<Task>();
-    public virtual User? UsersManager { get; set; }
+    public ProjectCategory? ProjectCategory { get; set; }
+    public ICollection<Models.Task>? Tasks { get; set; }
+    public User? UsersManager { get; set; }
 }

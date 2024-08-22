@@ -9,7 +9,7 @@ using PmsApi.Models;
 namespace PmsApi.Controllers;
 
 [ApiController]                 //needed to define the controller
-[Route("api/users")]
+[Route("api/projects")]
 public class UsersController : ControllerBase
 {
     private readonly PmsapiContext _context;
@@ -36,7 +36,7 @@ public class UsersController : ControllerBase
         var users = await usersQuery.ToListAsync();
         var usersDto = _mapper.Map<IEnumerable<UserDto>>(users);
 
-        return Ok(users);
+        return Ok(usersDto);
     }
 
     [HttpGet("{id:int}")]
