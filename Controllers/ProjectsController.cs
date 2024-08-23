@@ -1,6 +1,7 @@
 using AutoMapper;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
+using MySqlConnector;
 using PmsApi.DataContexts;
 using PmsApi.DTOs;
 using PmsApi.Models;
@@ -69,4 +70,35 @@ public class ProjectsController : ControllerBase
         var projectDto = _mapper.Map<ProjectWithTaskDto>(project);
         return Ok(projectDto);
     }
+
+    [HttpPost]
+    public async Task<ActionResult> CreateProject(CreateProjectDto projectDto)
+    {
+        if (!ModelState.IsValid)
+        {
+            return BadRequest(ModelState);
+        }
+
+        var project = _mapper.Map<Project>(projectDto);
+
+        try
+        {
+            _context.Projects.Add(project);
+            await _context.SaveChangesAsync();
+            var newProjectDto = _mapper.Map<Project>(projectDto);
+            // api/projects/{newId} ---> CreatedAtAction() returns the new URL for the resource
+            return CreatedAtAction(nameof(GetProject), new { id = project.ProjectId }, newProjectDto);
+        }
+        catch (DbUpdateException ex)
+        when (ex.InnerException is MySqlException mySqlException
+        && mySqlException.Number == 1062)
+        {
+            return BadRequest("Email already exists.");
+        }
+        catch (Exception ex)
+        {
+            return StatusCode(500, ex.Message);
+        }
+    }
+
 }
