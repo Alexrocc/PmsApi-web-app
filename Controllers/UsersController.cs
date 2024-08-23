@@ -9,7 +9,7 @@ using PmsApi.Models;
 namespace PmsApi.Controllers;
 
 [ApiController]                 //needed to define the controller
-[Route("api/projects")]
+[Route("api/users")]
 public class UsersController : ControllerBase
 {
     private readonly PmsapiContext _context;
@@ -39,10 +39,10 @@ public class UsersController : ControllerBase
         return Ok(usersDto);
     }
 
-    [HttpGet("{id:int}")]
-    public async Task<ActionResult<User>> GetUser(int id)
+    [HttpGet("{userId:int}")]
+    public async Task<ActionResult<User>> GetUser(int userId)
     {
-        User? user = await _context.Users.FirstOrDefaultAsync(u => u.UserId == id);
+        User? user = await _context.Users.FirstOrDefaultAsync(u => u.UserId == userId);
         if (user is null)
         {
             return NotFound();

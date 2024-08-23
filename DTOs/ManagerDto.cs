@@ -14,5 +14,5 @@ public record ManagerDto
 
     string Password,
 
-    int RoleId,
+    int RoleId
 );

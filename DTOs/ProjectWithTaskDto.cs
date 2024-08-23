@@ -1,16 +1,15 @@
 namespace PmsApi.DTOs;
 
-public record ProjectWithTaskDto
-(
+public record ProjectWithTaskDto(
      int ProjectId,
 
      string ProjectName,
 
-     string? Description,
+     string Description,
 
-     DateOnly? StartDate,
+     DateOnly StartDate,
 
-     DateOnly? EndDate,
+     DateOnly EndDate,
 
      int ProjectCategoriesId,
 
@@ -18,7 +17,7 @@ public record ProjectWithTaskDto
 
      ICollection<TaskDto>? Tasks,
 
-     ManagerDto Manager,
+     ManagerDto? UsersManager,
 
-     CategoryDto ProjectCategory
+     CategoryDto? ProjectCategory
 );

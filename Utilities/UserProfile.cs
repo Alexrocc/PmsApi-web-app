@@ -15,12 +15,14 @@ class UserProfile : Profile
         CreateMap<User, ManagerDto>();
 
         CreateMap<User, UserDto>().ForMember(d => d.Projects, opt => opt.MapFrom(src => src.Projects))
-        .ForMember(d => d.Tasks, opt => opt.MapFrom(src => src.Tasks)); //mapping avoids recursivity
+        .ForMember(d => d.Tasks, opt => opt.MapFrom(src => src.Tasks)); //mapping avoids recursivity of result
 
         CreateMap<Project, ProjectDto>();
 
+        CreateMap<ProjectDto, ProjectWithTaskDto>();
+
         CreateMap<Project, ProjectWithTaskDto>()
-        .ForMember(d => d.Manager, opt => opt.MapFrom(src => src.UsersManager));
+        .ForMember(d => d.UsersManager, opt => opt.MapFrom(src => src.UsersManager));
 
         CreateMap<Models.Task, TaskDto>();
 

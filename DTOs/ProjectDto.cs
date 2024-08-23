@@ -6,11 +6,11 @@ public record ProjectDto
 
      string ProjectName,
 
-     string? Description,
+     string Description,
 
-     DateOnly? StartDate,
+     DateOnly StartDate,
 
-     DateOnly? EndDate,
+     DateOnly EndDate,
 
      int ProjectCategoriesId,
 
