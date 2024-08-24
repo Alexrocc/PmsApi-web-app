@@ -85,15 +85,15 @@ public class ProjectsController : ControllerBase
         {
             _context.Projects.Add(project);
             await _context.SaveChangesAsync();
-            var newProjectDto = _mapper.Map<Project>(projectDto);
+            var newProjectDto = _mapper.Map<ProjectDto>(project);
             // api/projects/{newId} ---> CreatedAtAction() returns the new URL for the resource
-            return CreatedAtAction(nameof(GetProject), new { id = project.ProjectId }, newProjectDto);
+            return CreatedAtAction(nameof(GetProject), new { projectId = project.ProjectId }, newProjectDto);
         }
         catch (DbUpdateException ex)
         when (ex.InnerException is MySqlException mySqlException
         && mySqlException.Number == 1062)
         {
-            return BadRequest("Email already exists.");
+            return BadRequest("Project name already taken.");
         }
         catch (Exception ex)
         {
