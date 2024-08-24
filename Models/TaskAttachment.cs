@@ -2,9 +2,9 @@
 
 public partial class TaskAttachment
 {
-    public int Id { get; set; }
+    public int AttachmentId { get; set; }
     public string FileName { get; set; } = null!;
     public byte[] FileData { get; set; } = null!;
-    public int? TasksId { get; set; }
+    public int? TaskId { get; set; }
     public Task? Tasks { get; set; }
 }

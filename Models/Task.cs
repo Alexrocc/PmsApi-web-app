@@ -10,9 +10,9 @@ public partial class Task
     public int PriorityId { get; set; }
     public Priority? Priority { get; set; }
     public DateOnly? DueDate { get; set; }
-    public int? ProjectsId { get; set; }
-    public int? UsersId { get; set; }
-    public Project? Projects { get; set; }
+    public int? ProjectId { get; set; }
+    public int? UserId { get; set; }
+    public Project? Project { get; set; }
     public ICollection<TaskAttachment> TaskAttachments { get; set; } = new List<TaskAttachment>();
-    public User? Users { get; set; }
+    public User? AssignedUser { get; set; }
 }

@@ -1,6 +1,6 @@
 namespace PmsApi.DTOs;
 
-public record TaskDto(
+public record TaskAllDto(
      int TaskId,
 
      string Title,
@@ -13,7 +13,9 @@ public record TaskDto(
 
      DateOnly DueDate,
 
-     int ProjectsId,
+     ProjectDto Project,
 
-     UserDto User
+     UserDto User,
+
+     List<TaskAttachmentDto> TaskAttachments
 );

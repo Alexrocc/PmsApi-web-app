@@ -45,6 +45,7 @@ public class ProjectsController : ControllerBase
 
         return Ok(projectsDto);
     }
+
     [HttpGet("{projectId}/tasks")]
     public async Task<ActionResult<ProjectWithTaskDto>> GetProjectTasks(int projectId)
     {

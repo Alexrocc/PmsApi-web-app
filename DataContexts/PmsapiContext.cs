@@ -125,9 +125,9 @@ public partial class PmsapiContext : DbContext
 
                 entity.ToTable("tasks");
 
-                entity.HasIndex(e => e.ProjectsId, "projects_id");
+                entity.HasIndex(e => e.ProjectId, "projects_id");
 
-                entity.HasIndex(e => e.UsersId, "users_id");
+                entity.HasIndex(e => e.UserId, "users_id");
 
                 entity.HasIndex(e => e.StatusId, "status_id");
 
@@ -146,24 +146,24 @@ public partial class PmsapiContext : DbContext
                 entity.Property(e => e.StatusId)
                     .HasColumnType("int(11)")
                     .HasColumnName("status_id");
-                entity.Property(e => e.ProjectsId)
+                entity.Property(e => e.ProjectId)
                     .HasColumnType("int(11)")
                     .HasColumnName("projects_id");
 
                 entity.Property(e => e.Title)
                     .HasMaxLength(100)
                     .HasColumnName("title");
-                entity.Property(e => e.UsersId)
+                entity.Property(e => e.UserId)
                     .HasColumnType("int(11)")
                     .HasColumnName("users_id");
 
-                entity.HasOne(d => d.Projects).WithMany(p => p.Tasks)
-                    .HasForeignKey(d => d.ProjectsId)
+                entity.HasOne(d => d.Project).WithMany(p => p.Tasks)
+                    .HasForeignKey(d => d.ProjectId)
                     .HasConstraintName("tasks_ibfk_1");
 
-                entity.HasOne(d => d.Users).WithMany(p => p.Tasks)
-                    .HasForeignKey(d => d.UsersId)
-                    .HasConstraintName("tasks_ibfk_2");
+                // entity.HasOne(d => d.Users).WithMany(p => p.Tasks)
+                //     .HasForeignKey(d => d.UsersId)
+                //     .HasConstraintName("tasks_ibfk_2");
 
                 // entity.HasOne(d => d.Status).WithMany(p => p.Tasks)
                 // .HasForeignKey(d => d.StatusId)
@@ -178,13 +178,13 @@ public partial class PmsapiContext : DbContext
 
             modelBuilder.Entity<TaskAttachment>(entity =>
             {
-                entity.HasKey(e => e.Id).HasName("PRIMARY");
+                entity.HasKey(e => e.AttachmentId).HasName("PRIMARY");
 
                 entity.ToTable("task_attachments");
 
-                entity.HasIndex(e => e.TasksId, "tasks_id");
+                entity.HasIndex(e => e.TaskId, "tasks_id");
 
-                entity.Property(e => e.Id)
+                entity.Property(e => e.AttachmentId)
                     .HasColumnType("int(11)")
                     .HasColumnName("id");
                 entity.Property(e => e.FileData)
@@ -193,12 +193,12 @@ public partial class PmsapiContext : DbContext
                 entity.Property(e => e.FileName)
                     .HasMaxLength(255)
                     .HasColumnName("file_name");
-                entity.Property(e => e.TasksId)
+                entity.Property(e => e.TaskId)
                     .HasColumnType("int(11)")
                     .HasColumnName("tasks_id");
 
                 entity.HasOne(d => d.Tasks).WithMany(p => p.TaskAttachments)
-                    .HasForeignKey(d => d.TasksId)
+                    .HasForeignKey(d => d.TaskId)
                     .HasConstraintName("task_attachments_ibfk_1");
             });
 
