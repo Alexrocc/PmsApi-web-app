@@ -6,7 +6,7 @@ public record TaskAttachmentDto
 
     string FileName,
 
-    byte[] FileData,
+    string FileData,
 
     int? TaskId
 );

@@ -5,6 +5,7 @@ using MySqlConnector;
 using PmsApi.DataContexts;
 using PmsApi.DTOs;
 using PmsApi.Models;
+using PmsApi.Utilities;
 
 namespace PmsApi.Controllers;
 
@@ -25,20 +26,7 @@ public class ProjectsController : ControllerBase
     [HttpGet]
     public async Task<ActionResult<IEnumerable<ProjectWithTaskDto>>> GetProjects([FromQuery] string include = "")
     {
-        var projectsQuery = _context.Projects.AsQueryable();      //dynamic query for including dependend data
-
-        if (include.Contains("tasks", StringComparison.OrdinalIgnoreCase))
-        {
-            projectsQuery = projectsQuery.Include(p => p.Tasks);
-        }
-        if (include.Contains("manager", StringComparison.OrdinalIgnoreCase))
-        {
-            projectsQuery = projectsQuery.Include(p => p.UsersManager);
-        }
-        if (include.Contains("category", StringComparison.OrdinalIgnoreCase))
-        {
-            projectsQuery = projectsQuery.Include(p => p.ProjectCategory);
-        }
+        var projectsQuery = QueryHelper.ApplyProjectIncludes(_context.Projects.AsQueryable(), include);
 
         var projects = await projectsQuery.ToListAsync();
         var projectsDto = _mapper.Map<IEnumerable<ProjectWithTaskDto>>(projects);
@@ -65,19 +53,8 @@ public class ProjectsController : ControllerBase
     [HttpGet("{projectId:int}")]
     public async Task<ActionResult<ProjectWithTaskDto>> GetProject([FromRoute] int projectId, [FromQuery] string include = "")
     {
-        var projectsQuery = _context.Projects.AsQueryable();
-        if (include.Contains("tasks", StringComparison.OrdinalIgnoreCase))
-        {
-            projectsQuery = projectsQuery.Include(p => p.Tasks);
-        }
-        if (include.Contains("manager", StringComparison.OrdinalIgnoreCase))
-        {
-            projectsQuery = projectsQuery.Include(p => p.UsersManager);
-        }
-        if (include.Contains("category", StringComparison.OrdinalIgnoreCase))
-        {
-            projectsQuery = projectsQuery.Include(p => p.ProjectCategory);
-        }
+        var projectsQuery = QueryHelper.ApplyProjectIncludes(_context.Projects.AsQueryable(), include);
+
         Project? project = await projectsQuery.FirstOrDefaultAsync(p => p.ProjectId == projectId);
         if (project is null)
         {

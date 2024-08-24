@@ -11,6 +11,8 @@ public record TaskAllDto(
 
      int PriorityId,
 
+     int AssignedUserId,
+
      DateOnly DueDate,
 
      ProjectDto Project,
