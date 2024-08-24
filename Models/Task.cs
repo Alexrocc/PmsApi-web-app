@@ -13,6 +13,6 @@ public partial class Task
     public int? ProjectId { get; set; }
     public int? UserId { get; set; }
     public Project? Project { get; set; }
-    public ICollection<TaskAttachment> TaskAttachments { get; set; } = new List<TaskAttachment>();
+    public IEnumerable<TaskAttachment>? TaskAttachments { get; set; }
     public User? AssignedUser { get; set; }
 }

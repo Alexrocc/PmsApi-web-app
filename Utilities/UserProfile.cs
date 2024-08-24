@@ -16,6 +16,8 @@ class UserProfile : Profile
 
         CreateMap<User, ManagerDto>();
 
+        CreateMap<User, SimpleUserDto>();
+
         CreateMap<User, UserDto>().ForMember(d => d.Projects, opt => opt.MapFrom(src => src.Projects))
         .ForMember(d => d.Tasks, opt => opt.MapFrom(src => src.Tasks)); //mapping avoids recursivity of result
 

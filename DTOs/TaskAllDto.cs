@@ -15,7 +15,7 @@ public record TaskAllDto(
 
      ProjectDto Project,
 
-     UserDto User,
+     SimpleUserDto AssignedUser,
 
-     List<TaskAttachmentDto> TaskAttachments
+     IEnumerable<TaskAttachmentDto> TaskAttachments
 );
