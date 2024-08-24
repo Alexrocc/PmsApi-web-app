@@ -101,4 +101,73 @@ public class ProjectsController : ControllerBase
         }
     }
 
+    [HttpPut("{projectId:int}")]
+    public async Task<ActionResult> UpdateProject([FromRoute] int projectId, [FromBody] CreateProjectDto projectDto) //[FromBody] is not necessary for POST and PUT calls, since it is implicitly understood by Entity
+    {
+        if (!ModelState.IsValid)
+        {
+            return BadRequest(ModelState);
+        }
+
+        Project? project = await _context.Projects.FindAsync(projectId);
+
+        if (project is null)
+        {
+            return NotFound($"The project with the ID {projectId} could not be found.");
+        }
+
+        _mapper.Map(projectDto, project);
+
+        // project.ProjectName = projectDto.ProjectName;
+        // project.Description = projectDto.Description;
+        // project.UsersManagerId = projectDto.UsersManagerId;
+        // project.ProjectCategoriesId = projectDto.ProjectCategoriesId;
+        // project.StatusId = projectDto.StatusId;
+        // project.PriorityId = projectDto.PriorityId;
+        // project.StartDate = projectDto.StartDate;
+        // project.EndDate = projectDto.EndDate;
+
+        try
+        {
+            await _context.SaveChangesAsync();
+            // api/users/{newId} ---> CreatedAtAction() returns the new URL for the resource
+            return Ok();
+        }
+        catch (DbUpdateException ex)
+        when (ex.InnerException is MySqlException mySqlException
+        && mySqlException.Number == 1062)
+        {
+            return BadRequest("Project name already taken.");
+        }
+        catch (Exception ex)
+        {
+            return StatusCode(500, ex.Message);
+        }
+    }
+
+    [HttpDelete]
+    public async Task<ActionResult> DeleteProject(int projectId)
+    {
+        Project? project = await _context.Projects.FindAsync(projectId);
+
+        if (project == null)
+        {
+            return NotFound($"Could not find the user with ID {projectId}.");
+        }
+        try
+        {
+            _context.Projects.Remove(project);
+            await _context.SaveChangesAsync();
+            return NoContent();
+        }
+        catch (DbUpdateException ex)
+        when (ex.InnerException is MySqlException)
+        {
+            return BadRequest("The project has other dependencies. Please delete those first.");
+        }
+        catch (Exception)
+        {
+            return StatusCode(500, "An internal error has occoured.");
+        }
+    }
 }
