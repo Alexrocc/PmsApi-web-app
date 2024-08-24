@@ -45,6 +45,21 @@ public class ProjectsController : ControllerBase
 
         return Ok(projectsDto);
     }
+    [HttpGet("{projectId}/tasks")]
+    public async Task<ActionResult<ProjectWithTaskDto>> GetProjectTasks(int projectId)
+    {
+        var project = await _context.Projects.Include(p => p.Tasks)
+        .FirstAsync(p => p.ProjectId == projectId);
+
+        if (project == null)
+        {
+            return NotFound();
+        }
+
+        var projectsDto = _mapper.Map<ProjectWithTaskDto>(project);
+
+        return Ok(projectsDto);
+    }
 
     [HttpGet("{projectId:int}")]
     public async Task<ActionResult<ProjectWithTaskDto>> GetProject([FromRoute] int projectId, [FromQuery] string include = "")
@@ -152,7 +167,7 @@ public class ProjectsController : ControllerBase
 
         if (project == null)
         {
-            return NotFound($"Could not find the user with ID {projectId}.");
+            return NotFound($"No project found with ID {projectId}.");
         }
         try
         {
