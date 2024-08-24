@@ -49,7 +49,7 @@ public class TasksController : ControllerBase
     }
 
     [HttpGet("{Taskid:int}")]
-    public async Task<ActionResult<TaskDto>> GetProject([FromRoute] int Taskid, [FromQuery] string include = "")
+    public async Task<ActionResult<TaskAllDto>> GetTask([FromRoute] int Taskid, [FromQuery] string include = "")
     {
         var tasksQuery = QueryHelper.ApplyTaskIncludes(_context.Tasks.AsQueryable(), include);
 
@@ -58,7 +58,7 @@ public class TasksController : ControllerBase
         {
             return NotFound();
         }
-        var taskDto = _mapper.Map<TaskDto>(task);
+        var taskDto = _mapper.Map<TaskAllDto>(task);
         return Ok(task);
     }
 }
