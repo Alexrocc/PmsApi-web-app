@@ -197,7 +197,7 @@ public partial class PmsapiContext : DbContext
                     .HasColumnType("int(11)")
                     .HasColumnName("tasks_id");
 
-                entity.HasOne(d => d.Tasks).WithMany(p => p.TaskAttachments)
+                entity.HasOne(d => d.Task).WithMany(p => p.TaskAttachments)
                     .HasForeignKey(d => d.TaskId)
                     .HasConstraintName("task_attachments_ibfk_1");
             });

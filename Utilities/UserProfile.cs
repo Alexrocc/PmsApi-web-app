@@ -42,5 +42,8 @@ class UserProfile : Profile
 
         //task attachments mappings
         CreateMap<TaskAttachment, TaskAttachmentDto>();
+
+        CreateMap<TaskAttachment, AttachmentWithTaskDto>()
+        .ForMember(d => d.Task, opt => opt.MapFrom(src => src.Task));
     }
 }

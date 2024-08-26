@@ -48,18 +48,33 @@ public class TasksController : ControllerBase
         return Ok(taskDto);
     }
 
-    [HttpGet("{Taskid:int}")]
-    public async Task<ActionResult<TaskAllDto>> GetTask([FromRoute] int Taskid, [FromQuery] string include = "")
+    [HttpGet("{TaskId:int}")]
+    public async Task<ActionResult<TaskAllDto>> GetTask([FromRoute] int TaskId, [FromQuery] string include = "")
     {
         var tasksQuery = QueryHelper.ApplyTaskIncludes(_context.Tasks.AsQueryable(), include);
 
-        Task? task = await tasksQuery.FirstAsync(p => p.TaskId == Taskid);
+        Task? task = await tasksQuery.FirstAsync(p => p.TaskId == TaskId);
         if (task is null)
         {
             return NotFound();
         }
         var taskDto = _mapper.Map<TaskAllDto>(task);
         return Ok(task);
+    }
+
+    [HttpGet("{taskId}/attachments")]
+    public async Task<ActionResult<IEnumerable<AttachmentWithTaskDto>>> GetTaskAttachments(int taskId)
+    {
+        var taskAttachments = await _context.TaskAttachments.Where(x => x.TaskId == taskId).Include(y => y.Task).ToListAsync();
+
+        if (taskAttachments == null)
+        {
+            return NotFound();
+        }
+
+        var taskAttachmentsDto = _mapper.Map<IEnumerable<AttachmentWithTaskDto>>(taskAttachments);
+
+        return Ok(taskAttachmentsDto);
     }
 
     [HttpPost]
@@ -145,7 +160,7 @@ public class TasksController : ControllerBase
         catch (DbUpdateException ex)
         when (ex.InnerException is MySqlException)
         {
-            return BadRequest("The project has other dependencies. Please delete those first.");
+            return BadRequest("The task has other dependencies. Please delete those first.");
         }
         catch (Exception)
         {

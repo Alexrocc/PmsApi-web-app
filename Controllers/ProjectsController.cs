@@ -45,9 +45,9 @@ public class ProjectsController : ControllerBase
             return NotFound();
         }
 
-        var projectsDto = _mapper.Map<ProjectWithTaskDto>(project);
+        var projectDto = _mapper.Map<ProjectWithTaskDto>(project);
 
-        return Ok(projectsDto);
+        return Ok(projectDto);
     }
 
     [HttpGet("{projectId:int}")]
