@@ -91,4 +91,65 @@ public class TasksController : ControllerBase
             return StatusCode(500, ex.Message);
         }
     }
+
+    [HttpPut("{taskId:int}")]
+    public async Task<ActionResult> UpdateTask([FromRoute] int taskId, [FromBody] CreateTaskDto taskDto) //[FromBody] is not necessary for POST and PUT calls, since it is implicitly understood by Entity
+    {
+        if (!ModelState.IsValid)
+        {
+            return BadRequest(ModelState);
+        }
+
+        Task? task = await _context.Tasks.FindAsync(taskId);
+
+        if (task is null)
+        {
+            return NotFound($"The project with the ID {taskId} could not be found.");
+        }
+
+        _mapper.Map(taskDto, task);
+
+        try
+        {
+            await _context.SaveChangesAsync();
+            // api/users/{newId} ---> CreatedAtAction() returns the new URL for the resource
+            return Ok();
+        }
+        catch (DbUpdateException ex)
+        when (ex.InnerException is MySqlException mySqlException
+        && mySqlException.Number == 1062)
+        {
+            return BadRequest("Project name already taken.");
+        }
+        catch (Exception ex)
+        {
+            return StatusCode(500, ex.Message);
+        }
+    }
+
+    [HttpDelete]
+    public async Task<ActionResult> DeleteTask(int taskId)
+    {
+        Task? task = await _context.Tasks.FindAsync(taskId);
+
+        if (task == null)
+        {
+            return NotFound($"No task found with ID {taskId}.");
+        }
+        try
+        {
+            _context.Tasks.Remove(task);
+            await _context.SaveChangesAsync();
+            return NoContent();
+        }
+        catch (DbUpdateException ex)
+        when (ex.InnerException is MySqlException)
+        {
+            return BadRequest("The project has other dependencies. Please delete those first.");
+        }
+        catch (Exception)
+        {
+            return StatusCode(500, "An internal error has occoured.");
+        }
+    }
 }
