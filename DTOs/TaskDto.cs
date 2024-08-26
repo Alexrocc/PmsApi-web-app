@@ -1,11 +1,12 @@
 namespace PmsApi.DTOs;
 
 public record TaskDto(
+
      int TaskId,
 
      string Title,
 
-     string Description,
+     string? Description,
 
      int StatusId,
 

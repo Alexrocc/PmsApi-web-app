@@ -61,4 +61,34 @@ public class TasksController : ControllerBase
         var taskDto = _mapper.Map<TaskAllDto>(task);
         return Ok(task);
     }
+
+    [HttpPost]
+    public async Task<ActionResult> CreateTask(CreateTaskDto TaskDto)
+    {
+        if (!ModelState.IsValid)
+        {
+            return BadRequest(ModelState);
+        }
+
+        var task = _mapper.Map<Task>(TaskDto);
+
+        try
+        {
+            _context.Tasks.Add(task);
+            await _context.SaveChangesAsync();
+            var newTaskDto = _mapper.Map<TaskDto>(task);
+            // api/projects/{newId} ---> CreatedAtAction() returns the new URL for the resource
+            return CreatedAtAction(nameof(GetTask), new { taskId = task.ProjectId }, newTaskDto);
+        }
+        catch (DbUpdateException ex)
+        when (ex.InnerException is MySqlException mySqlException
+        && mySqlException.Number == 1062)
+        {
+            return BadRequest("Task name already taken.");
+        }
+        catch (Exception ex)
+        {
+            return StatusCode(500, ex.Message);
+        }
+    }
 }

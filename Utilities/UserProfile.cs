@@ -1,6 +1,7 @@
 using AutoMapper;
 using PmsApi.DTOs;
 using PmsApi.Models;
+using Task = PmsApi.Models.Task;
 
 namespace PmsApi.Utilities;
 
@@ -31,11 +32,13 @@ class UserProfile : Profile
         .ForMember(d => d.UsersManager, opt => opt.MapFrom(src => src.UsersManager));
 
         //tasks mappings
-        CreateMap<Models.Task, TaskDto>();
+        CreateMap<Task, TaskDto>();
 
         CreateMap<ProjectCategory, CategoryDto>();
 
-        CreateMap<Models.Task, TaskAllDto>();
+        CreateMap<Task, TaskAllDto>();
+
+        CreateMap<CreateTaskDto, Task>();
 
         //task attachments mappings
         CreateMap<TaskAttachment, TaskAttachmentDto>();
