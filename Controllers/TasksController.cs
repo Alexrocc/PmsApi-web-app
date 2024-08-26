@@ -4,7 +4,6 @@ using Microsoft.EntityFrameworkCore;
 using MySqlConnector;
 using PmsApi.DataContexts;
 using PmsApi.DTOs;
-using PmsApi.Models;
 using PmsApi.Utilities;
 using Task = PmsApi.Models.Task;
 
@@ -29,37 +28,24 @@ public class TasksController : ControllerBase
     {
         var tasksQuery = QueryHelper.ApplyTaskIncludes(_context.Tasks.AsQueryable(), include);      //dynamic query for including dependend data with helper class
 
-        // if (include.Contains("project", StringComparison.OrdinalIgnoreCase))
-        // {
-        //     tasksQuery = tasksQuery.Include(p => p.Project);
-        // }
-        // if (include.Contains("user", StringComparison.OrdinalIgnoreCase))
-        // {
-        //     tasksQuery = tasksQuery.Include(p => p.AssignedUser);
-        // }
-        // if (include.Contains("attachments", StringComparison.OrdinalIgnoreCase))
-        // {
-        //     tasksQuery = tasksQuery.Include(p => p.TaskAttachments);
-        // }
-
         var tasks = await tasksQuery.ToListAsync();
         var taskDto = _mapper.Map<IEnumerable<TaskAllDto>>(tasks);
 
         return Ok(taskDto);
     }
 
-    [HttpGet("{TaskId:int}")]
-    public async Task<ActionResult<TaskAllDto>> GetTask([FromRoute] int TaskId, [FromQuery] string include = "")
+    [HttpGet("{taskId:int}")]
+    public async Task<ActionResult<TaskAllDto>> GetTask([FromRoute] int taskId, [FromQuery] string include = "")
     {
         var tasksQuery = QueryHelper.ApplyTaskIncludes(_context.Tasks.AsQueryable(), include);
 
-        Task? task = await tasksQuery.FirstAsync(p => p.TaskId == TaskId);
+        Task? task = await tasksQuery.FirstAsync(p => p.TaskId == taskId);
         if (task is null)
         {
             return NotFound();
         }
         var taskDto = _mapper.Map<TaskAllDto>(task);
-        return Ok(task);
+        return Ok(taskDto);
     }
 
     [HttpGet("{taskId}/attachments")]
@@ -78,14 +64,14 @@ public class TasksController : ControllerBase
     }
 
     [HttpPost]
-    public async Task<ActionResult> CreateTask(CreateTaskDto TaskDto)
+    public async Task<ActionResult> CreateTask(CreateTaskDto taskDto)
     {
         if (!ModelState.IsValid)
         {
             return BadRequest(ModelState);
         }
 
-        var task = _mapper.Map<Task>(TaskDto);
+        var task = _mapper.Map<Task>(taskDto);
 
         try
         {

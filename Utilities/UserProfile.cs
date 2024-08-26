@@ -45,5 +45,17 @@ class UserProfile : Profile
 
         CreateMap<TaskAttachment, AttachmentWithTaskDto>()
         .ForMember(d => d.Task, opt => opt.MapFrom(src => src.Task));
+
+        //Category mappings
+        CreateMap<ProjectCategory, CategoryDto>();
+        CreateMap<CreateCategoryDto, ProjectCategory>();
+
+        //Status mappings
+        CreateMap<Status, StatusDto>();
+        CreateMap<CreateStatusDto, Status>();
+
+        //Priority mappings
+        CreateMap<Priority, PriorityDto>();
+        CreateMap<CreatePriorityDto, Priority>();
     }
 }
