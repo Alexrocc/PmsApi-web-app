@@ -39,10 +39,10 @@ public class UsersController : ControllerBase
         return Ok(usersDto);
     }
 
-    [HttpGet("{id:string}")]
-    public async Task<ActionResult<User>> GetUser(string id)
+    [HttpGet("{userId:string}")]
+    public async Task<ActionResult<User>> GetUser(string userId)
     {
-        User? user = await _context.Users.FirstOrDefaultAsync(u => u.Id == id);
+        User? user = await _context.Users.FirstOrDefaultAsync(u => u.Id == userId);
         if (user is null)
         {
             return NotFound();
@@ -80,26 +80,21 @@ public class UsersController : ControllerBase
         }
     }
 
-    [HttpPatch("{id:string}")]
-    public async Task<ActionResult> UpdateUser([FromRoute] string id, [FromBody] UpdateUserDto userDto) //[FromBody] is not necessary for POST and PUT calls, since it is implicitly understood by Entity
+    [HttpPatch("{userId:string}")]
+    public async Task<ActionResult> UpdateUser([FromRoute] string userId, [FromBody] UpdateUserDto userDto) //[FromBody] is not necessary for POST and PUT calls, since it is implicitly understood by Entity
     {
         if (!ModelState.IsValid)
         {
             return BadRequest(ModelState);
         }
 
-        User? user = await _context.Users.FindAsync(id);
+        User? user = await _context.Users.FindAsync(userId);
 
         if (user is null)
         {
-            return NotFound($"The user with the id {id} could not be found.");
+            return NotFound($"The user with the id {userId} could not be found.");
         }
 
-        // user.UserName = userDto.UserName;
-        // user.Email = userDto.Email;
-        // user.FirstName = userDto.FirstName;
-        // user.LastName = userDto.Lastname;
-        // user.r = userDto.RoleId;
         _mapper.Map(userDto, user);
 
         try

@@ -1,4 +1,5 @@
-﻿using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
+﻿using Microsoft.AspNetCore.Identity;
+using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore;
 using PmsApi.Models;
 
@@ -20,28 +21,28 @@ public partial class PmsapiContext : IdentityDbContext
     public DbSet<ProjectCategory> ProjectCategories { get; set; }
 
     public new DbSet<Role> Roles { get; set; }
+    // public DbSet<IdentityRole> IdentityRoles { get; set; }
 
     public DbSet<Models.Task> Tasks { get; set; }
 
     public DbSet<TaskAttachment> TaskAttachments { get; set; }
 
     public new DbSet<User> Users { get; set; }
+    // public DbSet<IdentityUser> IdentityUsers { get; set; }
 
     public DbSet<Status> Statuses { get; set; }
 
     public DbSet<Priority> Priorities { get; set; }
 
     // protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
+    // {
 
     //     => optionsBuilder.UseMySql(connectionString, Microsoft.EntityFrameworkCore.ServerVersion.Parse("11.4.2-mariadb"));
+    // }
+
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
-        base.OnModelCreating(modelBuilder);
-
-        modelBuilder
-            .UseCollation("latin1_swedish_ci")
-            .HasCharSet("latin1");
         try
         {
             modelBuilder.Entity<Project>(entity =>
@@ -76,7 +77,7 @@ public partial class PmsapiContext : IdentityDbContext
                 entity.Property(e => e.StartDate).IsRequired()
                     .HasColumnName("start_date");
                 entity.Property(e => e.UsersManagerId)
-                    .HasColumnType("int(11)")
+                    .HasMaxLength(255)
                     .HasColumnName("users_manager_id");
                 entity.Property(e => e.StatusId)
                     .HasColumnType("int(11)")
@@ -110,14 +111,14 @@ public partial class PmsapiContext : IdentityDbContext
 
             // modelBuilder.Entity<Role>(entity =>
             // {
-            //     entity.HasKey(e => e.RoleId).HasName("PRIMARY");
+            //     entity.HasKey(e => e.Id).HasName("PRIMARY");
 
             //     entity.ToTable("roles");
 
-            //     entity.Property(e => e.RoleId)
+            //     entity.Property(e => e.Id)
             //         .HasColumnType("int(11)")
             //         .HasColumnName("id");
-            //     entity.Property(e => e.RoleName)
+            //     entity.Property(e => e.Name)
             //         .HasMaxLength(50)
             //         .HasColumnName("name");
             // });
@@ -157,7 +158,7 @@ public partial class PmsapiContext : IdentityDbContext
                     .HasMaxLength(100)
                     .HasColumnName("title");
                 entity.Property(e => e.UserId)
-                    .HasColumnType("int(11)")
+                    .HasMaxLength(255)
                     .HasColumnName("users_id");
 
                 entity.HasOne(d => d.Project).WithMany(p => p.Tasks)
@@ -207,14 +208,14 @@ public partial class PmsapiContext : IdentityDbContext
 
             // modelBuilder.Entity<User>(entity =>
             // {
-            //     entity.HasKey(e => e.UserId).HasName("PRIMARY");
+            //     entity.HasKey(e => e.Id).HasName("PRIMARY");
 
             //     entity.ToTable("users");
 
-            //     entity.HasIndex(e => e.RoleId, "role_id");
+            //     // entity.HasIndex(e => e.RoleId, "role_id");
             //     entity.HasIndex(e => e.Email, "email").IsUnique();
 
-            //     entity.Property(e => e.UserId)
+            //     entity.Property(e => e.Id)
             //         .HasColumnType("int(11)")
             //         .HasColumnName("id");
             //     entity.Property(e => e.Email)
@@ -226,13 +227,13 @@ public partial class PmsapiContext : IdentityDbContext
             //     entity.Property(e => e.LastName)
             //         .HasMaxLength(50)
             //         .HasColumnName("last_name");
-            //     entity.Property(e => e.Password)
+            //     entity.Property(e => e.PasswordHash)
             //         .HasMaxLength(255)
             //         .HasColumnName("password");
-            //     entity.Property(e => e.RoleId)
-            //         .HasColumnType("int(11)")
-            //         .HasColumnName("role_id");
-            //     entity.Property(e => e.Username)
+            //     // entity.Property(e => e.)
+            //     //     .HasColumnType("int(11)")
+            //     //     .HasColumnName("role_id");
+            //     entity.Property(e => e.UserName)
             //         .HasMaxLength(50)
             //         .HasColumnName("username");
 
@@ -276,8 +277,8 @@ public partial class PmsapiContext : IdentityDbContext
                     .HasColumnName("name");
 
             });
-
-            OnModelCreatingPartial(modelBuilder);
+            base.OnModelCreating(modelBuilder);
+            // OnModelCreatingPartial(modelBuilder);
         }
         catch (NullReferenceException ex)
         {
@@ -289,5 +290,5 @@ public partial class PmsapiContext : IdentityDbContext
         }
     }
 
-    partial void OnModelCreatingPartial(ModelBuilder modelBuilder);
+    // partial void OnModelCreatingPartial(ModelBuilder modelBuilder);
 }

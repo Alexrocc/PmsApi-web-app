@@ -39,6 +39,9 @@ if (app.Environment.IsDevelopment())
     app.UseSwaggerUI();
 }
 
+//access endpoints
+app.MapIdentityApi<User>();
+
 app.UseHttpsRedirection();
 
 app.UseAuthorization();
