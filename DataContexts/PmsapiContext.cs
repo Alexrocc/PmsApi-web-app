@@ -1,9 +1,10 @@
-﻿using Microsoft.EntityFrameworkCore;
+﻿using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
+using Microsoft.EntityFrameworkCore;
 using PmsApi.Models;
 
 namespace PmsApi.DataContexts;
 
-public partial class PmsapiContext : DbContext
+public partial class PmsapiContext : IdentityDbContext
 {
     public PmsapiContext()
     {
@@ -14,21 +15,21 @@ public partial class PmsapiContext : DbContext
     {
     }
 
-    public virtual DbSet<Project> Projects { get; set; }
+    public DbSet<Project> Projects { get; set; }
 
-    public virtual DbSet<ProjectCategory> ProjectCategories { get; set; }
+    public DbSet<ProjectCategory> ProjectCategories { get; set; }
 
-    public virtual DbSet<Role> Roles { get; set; }
+    public new DbSet<Role> Roles { get; set; }
 
-    public virtual DbSet<Models.Task> Tasks { get; set; }
+    public DbSet<Models.Task> Tasks { get; set; }
 
-    public virtual DbSet<TaskAttachment> TaskAttachments { get; set; }
+    public DbSet<TaskAttachment> TaskAttachments { get; set; }
 
-    public virtual DbSet<User> Users { get; set; }
+    public new DbSet<User> Users { get; set; }
 
-    public virtual DbSet<Status> Statuses { get; set; }
+    public DbSet<Status> Statuses { get; set; }
 
-    public virtual DbSet<Priority> Priorities { get; set; }
+    public DbSet<Priority> Priorities { get; set; }
 
     // protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
 
@@ -36,6 +37,8 @@ public partial class PmsapiContext : DbContext
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
+        base.OnModelCreating(modelBuilder);
+
         modelBuilder
             .UseCollation("latin1_swedish_ci")
             .HasCharSet("latin1");
@@ -105,19 +108,19 @@ public partial class PmsapiContext : DbContext
                     .HasColumnName("name");
             });
 
-            modelBuilder.Entity<Role>(entity =>
-            {
-                entity.HasKey(e => e.Id).HasName("PRIMARY");
+            // modelBuilder.Entity<Role>(entity =>
+            // {
+            //     entity.HasKey(e => e.RoleId).HasName("PRIMARY");
 
-                entity.ToTable("roles");
+            //     entity.ToTable("roles");
 
-                entity.Property(e => e.Id)
-                    .HasColumnType("int(11)")
-                    .HasColumnName("id");
-                entity.Property(e => e.Name)
-                    .HasMaxLength(50)
-                    .HasColumnName("name");
-            });
+            //     entity.Property(e => e.RoleId)
+            //         .HasColumnType("int(11)")
+            //         .HasColumnName("id");
+            //     entity.Property(e => e.RoleName)
+            //         .HasMaxLength(50)
+            //         .HasColumnName("name");
+            // });
 
             modelBuilder.Entity<Models.Task>(entity =>
             {
@@ -202,42 +205,43 @@ public partial class PmsapiContext : DbContext
                     .HasConstraintName("task_attachments_ibfk_1");
             });
 
-            modelBuilder.Entity<User>(entity =>
-            {
-                entity.HasKey(e => e.UserId).HasName("PRIMARY");
+            // modelBuilder.Entity<User>(entity =>
+            // {
+            //     entity.HasKey(e => e.UserId).HasName("PRIMARY");
 
-                entity.ToTable("users");
+            //     entity.ToTable("users");
 
-                entity.HasIndex(e => e.RoleId, "role_id");
-                entity.HasIndex(e => e.Email, "email").IsUnique();
+            //     entity.HasIndex(e => e.RoleId, "role_id");
+            //     entity.HasIndex(e => e.Email, "email").IsUnique();
 
-                entity.Property(e => e.UserId)
-                    .HasColumnType("int(11)")
-                    .HasColumnName("id");
-                entity.Property(e => e.Email)
-                    .HasMaxLength(100)
-                    .HasColumnName("email");
-                entity.Property(e => e.FirstName)
-                    .HasMaxLength(50)
-                    .HasColumnName("first_name");
-                entity.Property(e => e.LastName)
-                    .HasMaxLength(50)
-                    .HasColumnName("last_name");
-                entity.Property(e => e.Password)
-                    .HasMaxLength(255)
-                    .HasColumnName("password");
-                entity.Property(e => e.RoleId)
-                    .HasColumnType("int(11)")
-                    .HasColumnName("role_id");
-                entity.Property(e => e.Username)
-                    .HasMaxLength(50)
-                    .HasColumnName("username");
+            //     entity.Property(e => e.UserId)
+            //         .HasColumnType("int(11)")
+            //         .HasColumnName("id");
+            //     entity.Property(e => e.Email)
+            //         .HasMaxLength(100)
+            //         .HasColumnName("email");
+            //     entity.Property(e => e.FirstName)
+            //         .HasMaxLength(50)
+            //         .HasColumnName("first_name");
+            //     entity.Property(e => e.LastName)
+            //         .HasMaxLength(50)
+            //         .HasColumnName("last_name");
+            //     entity.Property(e => e.Password)
+            //         .HasMaxLength(255)
+            //         .HasColumnName("password");
+            //     entity.Property(e => e.RoleId)
+            //         .HasColumnType("int(11)")
+            //         .HasColumnName("role_id");
+            //     entity.Property(e => e.Username)
+            //         .HasMaxLength(50)
+            //         .HasColumnName("username");
 
-                // entity.HasOne(d => d.Role).WithMany(p => p.Users)
-                //     .HasForeignKey(d => d.RoleId)
-                //     .OnDelete(DeleteBehavior.ClientSetNull)
-                //     .HasConstraintName("users_ibfk_1");
-            });
+            //     // entity.HasOne(d => d.Role).WithMany(p => p.Users)
+            //     //     .HasForeignKey(d => d.RoleId)
+            //     //     .OnDelete(DeleteBehavior.ClientSetNull)
+            //     //     .HasConstraintName("users_ibfk_1");
+            // });
+
             modelBuilder.Entity<Status>(entity =>
             {
                 entity.HasKey(e => e.StatusId).HasName("PRIMARY");
@@ -255,6 +259,7 @@ public partial class PmsapiContext : DbContext
 
 
             });
+
             modelBuilder.Entity<Priority>(entity =>
             {
                 entity.HasKey(e => e.PriorityId).HasName("PRIMARY");

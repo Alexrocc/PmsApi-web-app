@@ -11,7 +11,7 @@ public partial class Task
     public Priority? Priority { get; set; }
     public DateOnly? DueDate { get; set; }
     public int? ProjectId { get; set; }
-    public int? UserId { get; set; }
+    public string? UserId { get; set; }
     public Project? Project { get; set; }
     public IEnumerable<TaskAttachment>? TaskAttachments { get; set; }
     public User? AssignedUser { get; set; }
