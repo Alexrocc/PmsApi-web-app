@@ -40,7 +40,7 @@ public class UsersController : ControllerBase
         return Ok(usersDto);
     }
 
-    [HttpGet("{userId:string}")]
+    [HttpGet("{userId}")]
     public async Task<ActionResult<User>> GetUser(string userId)
     {
         User? user = await _context.Users.FirstOrDefaultAsync(u => u.Id == userId);
@@ -81,7 +81,7 @@ public class UsersController : ControllerBase
         }
     }
 
-    [HttpPatch("{userId:string}")]
+    [HttpPatch("{userId}")]
     public async Task<ActionResult> UpdateUser([FromRoute] string userId, [FromBody] UpdateUserDto userDto) //[FromBody] is not necessary for POST and PUT calls, since it is implicitly understood by Entity
     {
         if (!ModelState.IsValid)
