@@ -13,7 +13,7 @@ using System.Reflection;
 [assembly: System.Reflection.AssemblyCompanyAttribute("PmsApi")]
 [assembly: System.Reflection.AssemblyConfigurationAttribute("Debug")]
 [assembly: System.Reflection.AssemblyFileVersionAttribute("1.0.0.0")]
-[assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.0.0+662e6e9179f27d17a6cd3d287e12e43e5de9c302")]
+[assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.0.0+cdfabac4ba87b4c5bb781fcbf69861e6695627b5")]
 [assembly: System.Reflection.AssemblyProductAttribute("PmsApi")]
 [assembly: System.Reflection.AssemblyTitleAttribute("PmsApi")]
 [assembly: System.Reflection.AssemblyVersionAttribute("1.0.0.0")]
