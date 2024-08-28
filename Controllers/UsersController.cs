@@ -1,5 +1,6 @@
 using AutoMapper;
 using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using MySqlConnector;
@@ -13,12 +14,14 @@ namespace PmsApi.Controllers;
 [Route("api/users"), Authorize]
 public class UsersController : ControllerBase
 {
+    private readonly UserManager<User> _manager;
     private readonly PmsapiContext _context;
     private readonly IMapper _mapper;
-    public UsersController(PmsapiContext context, IMapper mapper)
+    public UsersController(PmsapiContext context, IMapper mapper, UserManager<User> manager)
     {
         _context = context;
         _mapper = mapper;
+        _manager = manager; //the manager is useful for single user operations like PUT, POST and DELETE
     }
 
     [HttpGet]
@@ -43,12 +46,13 @@ public class UsersController : ControllerBase
     [HttpGet("{userId}")]
     public async Task<ActionResult<User>> GetUser(string userId)
     {
-        User? user = await _context.Users.FirstOrDefaultAsync(u => u.Id == userId);
+        User? user = await _manager.FindByIdAsync(userId);
         if (user is null)
         {
             return NotFound();
         }
-        return Ok(user);
+        var userDto = _mapper.Map<UserDto>(user);
+        return Ok(userDto);
     }
 
     [HttpPost]
@@ -63,8 +67,11 @@ public class UsersController : ControllerBase
 
         try
         {
-            _context.Users.Add(user);
-            await _context.SaveChangesAsync();
+            var result = await _manager.CreateAsync(user, "Test123.");  //_manager.CreateAsync(instance of user object, optional password);
+            if (!result.Succeeded)
+            {
+                return StatusCode(500, "An error occoured while creating the user.");
+            }
             var newUserDto = _mapper.Map<User>(userDto);
             // api/users/{newId} ---> CreatedAtAction() returns the new URL for the resource
             return CreatedAtAction(nameof(GetUser), new { id = user.Id }, newUserDto);
@@ -89,7 +96,7 @@ public class UsersController : ControllerBase
             return BadRequest(ModelState);
         }
 
-        User? user = await _context.Users.FindAsync(userId);
+        User? user = await _manager.FindByIdAsync(userId);
 
         if (user is null)
         {
@@ -117,9 +124,9 @@ public class UsersController : ControllerBase
     }
 
     [HttpDelete]
-    public async Task<ActionResult> DeleteUser(int userId)
+    public async Task<ActionResult> DeleteUser(string userId)
     {
-        User? user = await _context.Users.FindAsync(userId);
+        User? user = await _manager.FindByIdAsync(userId);
 
         if (user == null)
         {
@@ -127,8 +134,7 @@ public class UsersController : ControllerBase
         }
         try
         {
-            _context.Users.Remove(user);
-            await _context.SaveChangesAsync();
+            await _manager.DeleteAsync(user);
             return NoContent();
         }
         catch (DbUpdateException ex)
