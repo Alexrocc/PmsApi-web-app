@@ -13,11 +13,17 @@ var connString = builder.Configuration.GetConnectionString("PmsContext");
 //Identity service
 builder.Services.AddIdentityApiEndpoints<User>()
 .AddEntityFrameworkStores<PmsapiContext>()
+.AddRoles<Role>()
 .AddApiEndpoints()
 .AddDefaultTokenProviders();
 
 //Authorization service
-builder.Services.AddAuthorization();
+builder.Services.AddAuthorization(opt =>
+    {
+        opt.AddPolicy("IsAdmin", p => p.RequireRole(["Admin"]));
+        opt.AddPolicy("IsSuperAdmin", p => p.RequireClaim("SuperAdmin"));
+    }
+);
 
 //Database service
 builder.Services.AddDbContext<PmsapiContext>(opt =>

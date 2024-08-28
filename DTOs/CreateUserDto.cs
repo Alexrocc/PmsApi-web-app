@@ -12,8 +12,4 @@ public class CreateUserDto
     [EmailAddress]
     public string Email { get; set; } = "";
     public string Password { get; set; } = "";
-    [Required(ErrorMessage = "Please specify your role.")]
-    [Range(1, 4, ErrorMessage = "Value must be between 1 and 4.")]
-    public int RoleId { get; set; }
-
 }
