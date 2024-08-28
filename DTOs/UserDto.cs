@@ -2,7 +2,7 @@ namespace PmsApi.DTOs;
 
 public record UserDto
 (
-    int UserId,
+    string Id,
 
     string UserName,
 
@@ -14,7 +14,7 @@ public record UserDto
 
     string Password,
 
-    int RoleId,
+    string PhoneNumber,
 
     List<ProjectDto> Projects,
 

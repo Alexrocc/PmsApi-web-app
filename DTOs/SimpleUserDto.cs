@@ -2,7 +2,7 @@ namespace PmsApi.DTOs;
 
 public record SimpleUserDto
 (
-    int UserId,
+    string Id,
 
     string UserName,
 
@@ -12,7 +12,5 @@ public record SimpleUserDto
 
     string Email,
 
-    string Password,
-
-    int RoleId
+    string Password
 );

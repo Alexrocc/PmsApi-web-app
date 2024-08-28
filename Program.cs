@@ -9,11 +9,14 @@ var connString = builder.Configuration.GetConnectionString("PmsContext");
 
 // Add services to the container.
 
-//Identity Auth service
-builder.Services.AddIdentity<User, Role>()
+//Identity service
+builder.Services.AddIdentityApiEndpoints<User>()
 .AddEntityFrameworkStores<PmsapiContext>()
 .AddApiEndpoints()
 .AddDefaultTokenProviders();
+
+//Authorization service
+builder.Services.AddAuthorization();
 
 //Database service
 builder.Services.AddDbContext<PmsapiContext>(opt =>
