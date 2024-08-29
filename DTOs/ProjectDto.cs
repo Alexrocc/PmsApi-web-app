@@ -14,5 +14,5 @@ public record ProjectDto
 
      int ProjectCategoriesId,
 
-     int UsersManagerId
+     string UsersManagerId
 );

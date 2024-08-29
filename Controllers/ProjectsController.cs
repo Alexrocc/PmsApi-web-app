@@ -1,4 +1,5 @@
 using AutoMapper;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using MySqlConnector;
@@ -10,7 +11,7 @@ using PmsApi.Utilities;
 namespace PmsApi.Controllers;
 
 [ApiController]                 //needed to define the controller
-[Route("api/projects")]
+[Route("api/projects"), Authorize]
 
 public class ProjectsController : ControllerBase
 {
@@ -26,7 +27,14 @@ public class ProjectsController : ControllerBase
     [HttpGet]
     public async Task<ActionResult<IEnumerable<ProjectWithTaskDto>>> GetProjects([FromQuery] string include = "")
     {
+        var userHelper = new UserContextHelper(HttpContext);
+
         var projectsQuery = QueryHelper.ApplyProjectIncludes(_context.Projects.AsQueryable(), include);
+
+        if (!userHelper.IsAdmin())
+        {
+            projectsQuery.Where(p => p.UsersManagerId == userHelper.GetUserId());
+        }
 
         var projects = await projectsQuery.ToListAsync();
         var projectsDto = _mapper.Map<IEnumerable<ProjectWithTaskDto>>(projects);
@@ -67,16 +75,23 @@ public class ProjectsController : ControllerBase
     [HttpPost]
     public async Task<ActionResult> CreateProject(CreateProjectDto projectDto)
     {
+
         if (!ModelState.IsValid)
         {
             return BadRequest(ModelState);
         }
 
+        var userHelper = new UserContextHelper(HttpContext);
+        if (!userHelper.IsAdmin())
+        {
+            projectDto.UsersManagerId = userHelper.GetUserId();
+        }
+
         var project = _mapper.Map<Project>(projectDto);
 
+        _context.Projects.Add(project);
         try
         {
-            _context.Projects.Add(project);
             await _context.SaveChangesAsync();
             var newProjectDto = _mapper.Map<ProjectDto>(project);
             // api/projects/{newId} ---> CreatedAtAction() returns the new URL for the resource

@@ -13,7 +13,7 @@ public record ProjectWithTaskDto(
 
      int ProjectCategoriesId,
 
-     int UsersManagerId,
+     string UsersManagerId,
 
      ICollection<TaskDto>? Tasks,
 
