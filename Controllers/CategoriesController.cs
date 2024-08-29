@@ -1,4 +1,5 @@
 using AutoMapper;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using MySqlConnector;
@@ -9,7 +10,7 @@ using PmsApi.Models;
 namespace PmsApi.Controllers;
 
 [ApiController]                 //needed to define the controller
-[Route("api/categories")]
+[Route("api/categories"), Authorize(Policy = "IsAdmin")]
 
 public class CategoriesController : ControllerBase
 {

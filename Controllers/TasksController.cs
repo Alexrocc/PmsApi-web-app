@@ -61,13 +61,18 @@ public class TasksController : ControllerBase
     [HttpGet("{taskId}/attachments")]
     public async Task<ActionResult<IEnumerable<AttachmentWithTaskDto>>> GetTaskAttachments(int taskId)
     {
-        var taskAttachments = await _context.TaskAttachments.Where(x => x.TaskId == taskId).Include(y => y.Task).ToListAsync();
+        var task = await _context.Tasks.Include(y => y.TaskAttachments).Where(x => x.TaskId == taskId).FirstOrDefaultAsync();
 
-        if (taskAttachments == null)
+        if (task == null)
         {
             return NotFound();
         }
 
+        if (!_userContextHelper.IsAdmin() && task.AssignedUserId != _userContextHelper.GetUserId())
+        {
+            return Unauthorized();
+        }
+        var taskAttachments = task.TaskAttachments;
         var taskAttachmentsDto = _mapper.Map<IEnumerable<AttachmentWithTaskDto>>(taskAttachments);
 
         return Ok(taskAttachmentsDto);
@@ -156,6 +161,10 @@ public class TasksController : ControllerBase
         if (task == null)
         {
             return NotFound($"No task found with ID {taskId}.");
+        }
+        if (!_userContextHelper.IsAdmin() && task.AssignedUserId != _userContextHelper.GetUserId())
+        {
+            return Unauthorized();
         }
         try
         {

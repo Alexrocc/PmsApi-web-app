@@ -48,11 +48,15 @@ public class ProjectsController : ControllerBase
     public async Task<ActionResult<ProjectWithTaskDto>> GetProjectTasks(int projectId)
     {
         var project = await _context.Projects.Include(p => p.Tasks)
-        .FirstAsync(p => p.ProjectId == projectId);
+        .FirstOrDefaultAsync(p => p.ProjectId == projectId);
 
         if (project == null)
         {
             return NotFound();
+        }
+        if (!_userContextHelper.IsAdmin() && project.UsersManagerId != _userContextHelper.GetUserId())
+        {
+            return Unauthorized();
         }
 
         var projectDto = _mapper.Map<ProjectWithTaskDto>(project);
@@ -124,6 +128,10 @@ public class ProjectsController : ControllerBase
         {
             return NotFound($"The project with the ID {projectId} could not be found.");
         }
+        if (!_userContextHelper.IsAdmin() && project.UsersManagerId != _userContextHelper.GetUserId())
+        {
+            return Unauthorized();
+        }
 
         _mapper.Map(projectDto, project);
 
@@ -162,6 +170,10 @@ public class ProjectsController : ControllerBase
         if (project == null)
         {
             return NotFound($"No project found with ID {projectId}.");
+        }
+        if (!_userContextHelper.IsAdmin() && project.UsersManagerId != _userContextHelper.GetUserId())
+        {
+            return Unauthorized();
         }
         try
         {
