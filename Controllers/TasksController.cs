@@ -1,4 +1,5 @@
 using AutoMapper;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using MySqlConnector;
@@ -10,17 +11,19 @@ using Task = PmsApi.Models.Task;
 namespace PmsApi.Controllers;
 
 [ApiController]                 //needed to define the controller
-[Route("api/tasks")]
+[Route("api/tasks"), Authorize]
 
 public class TasksController : ControllerBase
 {
+    private readonly IUserContextHelper _userContextHelper;
     private readonly PmsapiContext _context;
     private readonly IMapper _mapper;
 
-    public TasksController(PmsapiContext context, IMapper mapper)
+    public TasksController(PmsapiContext context, IMapper mapper, IUserContextHelper userContextHelper)
     {
         _context = context;
         _mapper = mapper;
+        _userContextHelper = userContextHelper;
     }
 
     [HttpGet]
@@ -28,6 +31,10 @@ public class TasksController : ControllerBase
     {
         var tasksQuery = QueryHelper.ApplyTaskIncludes(_context.Tasks.AsQueryable(), include);      //dynamic query for including dependend data with helper class
 
+        if (!_userContextHelper.IsAdmin())
+        {
+            tasksQuery.Where(p => p.AssignedUserId == _userContextHelper.GetUserId());
+        }
         var tasks = await tasksQuery.ToListAsync();
         var taskDto = _mapper.Map<IEnumerable<TaskAllDto>>(tasks);
 
@@ -38,8 +45,11 @@ public class TasksController : ControllerBase
     public async Task<ActionResult<TaskAllDto>> GetTask([FromRoute] int taskId, [FromQuery] string include = "")
     {
         var tasksQuery = QueryHelper.ApplyTaskIncludes(_context.Tasks.AsQueryable(), include);
-
-        Task? task = await tasksQuery.FirstAsync(p => p.TaskId == taskId);
+        if (!_userContextHelper.IsAdmin())
+        {
+            tasksQuery.Where(p => p.AssignedUserId == _userContextHelper.GetUserId());
+        }
+        var task = await tasksQuery.FirstAsync(p => p.TaskId == taskId);
         if (task is null)
         {
             return NotFound();
@@ -69,6 +79,11 @@ public class TasksController : ControllerBase
         if (!ModelState.IsValid)
         {
             return BadRequest(ModelState);
+        }
+
+        if (!_userContextHelper.IsAdmin())
+        {
+            taskDto.AssignedUserId = _userContextHelper.GetUserId();
         }
 
         var task = _mapper.Map<Task>(taskDto);
@@ -106,6 +121,11 @@ public class TasksController : ControllerBase
         if (task is null)
         {
             return NotFound($"The project with the ID {taskId} could not be found.");
+        }
+
+        if (!_userContextHelper.IsAdmin() && task.AssignedUserId != _userContextHelper.GetUserId())
+        {
+            return Unauthorized();
         }
 
         _mapper.Map(taskDto, task);

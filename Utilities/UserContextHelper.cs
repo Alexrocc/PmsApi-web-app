@@ -2,22 +2,22 @@ using System.Security.Claims;
 
 namespace PmsApi.Utilities;
 
-public class UserContextHelper
+public class UserContextHelper : IUserContextHelper
 {
-    private readonly HttpContext _httpContext;
+    private readonly IHttpContextAccessor _httpContextAccessor;
 
-    public UserContextHelper(HttpContext context)
+    public UserContextHelper(IHttpContextAccessor context)
     {
-        _httpContext = context;
+        _httpContextAccessor = context;
     }
 
     public bool IsAdmin()
     {
-        return _httpContext.User.IsInRole("Admin");
+        return _httpContextAccessor.HttpContext?.User.IsInRole("Admin") ?? false;
     }
 
     public string GetUserId()
     {
-        return _httpContext.User.FindFirstValue(ClaimTypes.NameIdentifier) ?? String.Empty;
+        return _httpContextAccessor.HttpContext?.User.FindFirstValue(ClaimTypes.NameIdentifier) ?? String.Empty;
     }
 }

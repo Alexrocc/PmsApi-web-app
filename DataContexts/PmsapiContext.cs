@@ -131,7 +131,7 @@ public partial class PmsapiContext : IdentityDbContext
 
                 entity.HasIndex(e => e.ProjectId, "projects_id");
 
-                entity.HasIndex(e => e.UserId, "users_id");
+                entity.HasIndex(e => e.AssignedUserId, "users_id");
 
                 entity.HasIndex(e => e.StatusId, "status_id");
 
@@ -157,7 +157,7 @@ public partial class PmsapiContext : IdentityDbContext
                 entity.Property(e => e.Title)
                     .HasMaxLength(100)
                     .HasColumnName("title");
-                entity.Property(e => e.UserId)
+                entity.Property(e => e.AssignedUserId)
                     .HasMaxLength(255)
                     .HasColumnName("users_id");
 

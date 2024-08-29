@@ -11,7 +11,7 @@ public record TaskAllDto(
 
      int PriorityId,
 
-     int AssignedUserId,
+     string AssignedUserId,
 
      DateOnly DueDate,
 

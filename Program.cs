@@ -4,6 +4,7 @@ using Microsoft.EntityFrameworkCore;
 using PmsApi.DataContexts;
 using PmsApi.Models;
 using Microsoft.OpenApi.Models;
+using PmsApi.Utilities;
 
 var builder = WebApplication.CreateBuilder(args);
 var connString = builder.Configuration.GetConnectionString("PmsContext");
@@ -35,6 +36,8 @@ builder.Services.AddControllers().AddJsonOptions(options =>
 {
     options.JsonSerializerOptions.ReferenceHandler = ReferenceHandler.IgnoreCycles; //this option prevents recursivity from GET responses
 });
+
+builder.Services.AddScoped<IUserContextHelper, UserContextHelper>();
 
 // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
 builder.Services.AddEndpointsApiExplorer();

@@ -15,25 +15,27 @@ namespace PmsApi.Controllers;
 
 public class ProjectsController : ControllerBase
 {
+    private readonly IUserContextHelper _userContextHelper;
     private readonly PmsapiContext _context;
     private readonly IMapper _mapper;
 
-    public ProjectsController(PmsapiContext context, IMapper mapper)
+    public ProjectsController(PmsapiContext context, IMapper mapper, IUserContextHelper userContextHelper)
     {
         _context = context;
         _mapper = mapper;
+        _userContextHelper = userContextHelper;
     }
 
     [HttpGet]
     public async Task<ActionResult<IEnumerable<ProjectWithTaskDto>>> GetProjects([FromQuery] string include = "")
     {
-        var userHelper = new UserContextHelper(HttpContext);
+
 
         var projectsQuery = QueryHelper.ApplyProjectIncludes(_context.Projects.AsQueryable(), include);
 
-        if (!userHelper.IsAdmin())
+        if (!_userContextHelper.IsAdmin())
         {
-            projectsQuery.Where(p => p.UsersManagerId == userHelper.GetUserId());
+            projectsQuery.Where(p => p.UsersManagerId == _userContextHelper.GetUserId());
         }
 
         var projects = await projectsQuery.ToListAsync();
@@ -81,10 +83,9 @@ public class ProjectsController : ControllerBase
             return BadRequest(ModelState);
         }
 
-        var userHelper = new UserContextHelper(HttpContext);
-        if (!userHelper.IsAdmin())
+        if (!_userContextHelper.IsAdmin())
         {
-            projectDto.UsersManagerId = userHelper.GetUserId();
+            projectDto.UsersManagerId = _userContextHelper.GetUserId();
         }
 
         var project = _mapper.Map<Project>(projectDto);

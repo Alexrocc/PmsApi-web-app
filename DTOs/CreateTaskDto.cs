@@ -26,5 +26,7 @@ public class CreateTaskDto
     public int ProjectsId { get; set; }
 
     [Required(ErrorMessage = "Assigned user is required.")]
+
+    public required string AssignedUserId { get; set; }
     public required UserDto User { get; set; }
 }

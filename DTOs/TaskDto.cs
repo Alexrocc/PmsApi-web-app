@@ -16,5 +16,7 @@ public record TaskDto(
 
      int ProjectsId,
 
+     string AssignedUserId,
+
      UserDto User
 );
