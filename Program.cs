@@ -11,12 +11,13 @@ var builder = WebApplication.CreateBuilder(args);
 var connString = builder.Configuration.GetConnectionString("PmsContext");
 
 // Add services to the container.
+
 //Database service
 builder.Services.AddDbContext<PmsapiContext>(opt =>
 opt.UseMySql(connString, ServerVersion.AutoDetect(connString)));
 
 //Identity service
-builder.Services.AddIdentity<User, Role>()
+builder.Services.AddIdentityApiEndpoints<User>()
 .AddEntityFrameworkStores<PmsapiContext>()
 .AddRoles<Role>()
 .AddApiEndpoints()
