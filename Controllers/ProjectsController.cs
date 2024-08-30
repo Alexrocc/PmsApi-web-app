@@ -6,6 +6,7 @@ using MySqlConnector;
 using PmsApi.DataContexts;
 using PmsApi.DTOs;
 using PmsApi.Models;
+using PmsApi.Services;
 using PmsApi.Utilities;
 
 namespace PmsApi.Controllers;
@@ -16,14 +17,16 @@ namespace PmsApi.Controllers;
 public class ProjectsController : ControllerBase
 {
     private readonly IUserContextHelper _userContextHelper;
+    private readonly IProjectService _projectService;
     private readonly PmsapiContext _context;
     private readonly IMapper _mapper;
 
-    public ProjectsController(PmsapiContext context, IMapper mapper, IUserContextHelper userContextHelper)
+    public ProjectsController(PmsapiContext context, IMapper mapper, IUserContextHelper userContextHelper, IProjectService projectService)
     {
         _context = context;
         _mapper = mapper;
         _userContextHelper = userContextHelper;
+        _projectService = projectService;
     }
 
     [HttpGet]
@@ -45,23 +48,23 @@ public class ProjectsController : ControllerBase
     }
 
     [HttpGet("{projectId}/tasks")]
-    public async Task<ActionResult<ProjectWithTaskDto>> GetProjectTasks(int projectId)
+    public async Task<ActionResult<ProjectWithTaskDto?>> GetProjectTasks(int projectId)
     {
-        var project = await _context.Projects.Include(p => p.Tasks)
-        .FirstOrDefaultAsync(p => p.ProjectId == projectId);
+        var userId = _userContextHelper.GetUserId();
+        var isAdmin = _userContextHelper.IsAdmin();
 
+        var project = await _projectService.GetProjectTasksAsync(projectId, userId, isAdmin);
         if (project == null)
         {
             return NotFound();
+
         }
-        if (!_userContextHelper.IsAdmin() && project.UsersManagerId != _userContextHelper.GetUserId())
+        if (project.Tasks == null || project.Tasks.Count == 0)
         {
-            return Unauthorized();
+            return NotFound($"There are currently no tasks assigned to the project with id {projectId}.");
         }
-
-        var projectDto = _mapper.Map<ProjectWithTaskDto>(project);
-
-        return Ok(projectDto);
+        var projectTasks = project.Tasks.ToList();
+        return Ok();
     }
 
     [HttpGet("{projectId:int}")]

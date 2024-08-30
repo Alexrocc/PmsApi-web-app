@@ -21,7 +21,7 @@ public class UsersController : ControllerBase
     {
         _context = context;
         _mapper = mapper;
-        _manager = manager; //the manager is useful for single user operations like PUT, POST and DELETE
+        _manager = manager; //the manager is useful for single item operations like PUT, POST and DELETE
     }
 
     [HttpGet]

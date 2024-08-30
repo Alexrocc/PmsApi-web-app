@@ -5,14 +5,18 @@ using PmsApi.DataContexts;
 using PmsApi.Models;
 using Microsoft.OpenApi.Models;
 using PmsApi.Utilities;
+using PmsApi.Services;
 
 var builder = WebApplication.CreateBuilder(args);
 var connString = builder.Configuration.GetConnectionString("PmsContext");
 
 // Add services to the container.
+//Database service
+builder.Services.AddDbContext<PmsapiContext>(opt =>
+opt.UseMySql(connString, ServerVersion.AutoDetect(connString)));
 
 //Identity service
-builder.Services.AddIdentityApiEndpoints<User>()
+builder.Services.AddIdentity<User, Role>()
 .AddEntityFrameworkStores<PmsapiContext>()
 .AddRoles<Role>()
 .AddApiEndpoints()
@@ -26,9 +30,6 @@ builder.Services.AddAuthorization(opt =>
     }
 );
 
-//Database service
-builder.Services.AddDbContext<PmsapiContext>(opt =>
-opt.UseMySql(connString, ServerVersion.AutoDetect(connString)));
 
 //Automapper service
 builder.Services.AddAutoMapper(typeof(Program));
@@ -38,6 +39,7 @@ builder.Services.AddControllers().AddJsonOptions(options =>
 });
 
 builder.Services.AddScoped<IUserContextHelper, UserContextHelper>();
+builder.Services.AddScoped<IProjectService, ProjectService>();
 
 // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
 builder.Services.AddEndpointsApiExplorer();
