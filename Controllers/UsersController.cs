@@ -11,7 +11,7 @@ using PmsApi.Models;
 namespace PmsApi.Controllers;
 
 [ApiController]                 //needed to define the controller
-[Route("api/users"), Authorize(Roles = "Admin", Policy = "IsSuperAdmin")]  //Roles is a comma-delimited list. There can only be one policy
+[Route("api/users"), Authorize(Roles = "Admin")]  //Roles is a comma-delimited list. There can only be one policy
 public class UsersController : ControllerBase
 {
     private readonly UserManager<User> _manager;

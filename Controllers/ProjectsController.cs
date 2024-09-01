@@ -32,8 +32,6 @@ public class ProjectsController : ControllerBase
     [HttpGet]
     public async Task<ActionResult<IEnumerable<ProjectWithTaskDto>>> GetProjects([FromQuery] string include = "")
     {
-
-
         var projectsQuery = QueryHelper.ApplyProjectIncludes(_context.Projects.AsQueryable(), include);
 
         if (!_userContextHelper.IsAdmin())
@@ -48,23 +46,17 @@ public class ProjectsController : ControllerBase
     }
 
     [HttpGet("{projectId}/tasks")]
-    public async Task<ActionResult<ProjectWithTaskDto?>> GetProjectTasks(int projectId)
+    public async Task<ActionResult<IEnumerable<ProjectWithTaskDto>>> GetProjectTasks(int projectId)
     {
         var userId = _userContextHelper.GetUserId();
         var isAdmin = _userContextHelper.IsAdmin();
 
-        var project = await _projectService.GetProjectTasksAsync(projectId, userId, isAdmin);
-        if (project == null)
+        var projectTasks = await _projectService.GetProjectTasksAsync(projectId, userId, isAdmin);
+        if (projectTasks == null)
         {
             return NotFound();
-
         }
-        if (project.Tasks == null || project.Tasks.Count == 0)
-        {
-            return NotFound($"There are currently no tasks assigned to the project with id {projectId}.");
-        }
-        var projectTasks = project.Tasks.ToList();
-        return Ok();
+        return Ok(projectTasks);
     }
 
     [HttpGet("{projectId:int}")]

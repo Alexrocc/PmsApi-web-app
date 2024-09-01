@@ -12,33 +12,38 @@ var connString = builder.Configuration.GetConnectionString("PmsContext");
 
 // Add services to the container.
 
-//Database service
-builder.Services.AddDbContext<PmsapiContext>(opt =>
-opt.UseMySql(connString, ServerVersion.AutoDetect(connString)));
-
-//Identity service
-builder.Services.AddIdentityApiEndpoints<User>()
-.AddEntityFrameworkStores<PmsapiContext>()
-.AddRoles<Role>()
-.AddApiEndpoints()
-.AddDefaultTokenProviders();
 
 //Authorization service
 builder.Services.AddAuthorization(opt =>
     {
-        opt.AddPolicy("IsAdmin", p => p.RequireRole(["Admin"]));
+        opt.AddPolicy("IsAdmin", p => p.RequireRole("Admin"));
         opt.AddPolicy("IsSuperAdmin", p => p.RequireClaim("SuperAdmin"));
     }
 );
+//Identity service
+builder.Services
+// .AddIdentity<User, Role>()
+.AddIdentityApiEndpoints<User>()
+.AddRoles<Role>()
+.AddEntityFrameworkStores<PmsapiContext>()
+.AddApiEndpoints()
+.AddDefaultTokenProviders();
 
+builder.Services.AddScoped<RoleManager<Role>>();
+
+//Database service
+builder.Services.AddDbContext<PmsapiContext>(opt =>
+opt.UseMySql(connString, ServerVersion.AutoDetect(connString)));
 
 //Automapper service
 builder.Services.AddAutoMapper(typeof(Program));
+
 builder.Services.AddControllers().AddJsonOptions(options =>
 {
     options.JsonSerializerOptions.ReferenceHandler = ReferenceHandler.IgnoreCycles; //this option prevents recursivity from GET responses
 });
 
+//Dependency injections
 builder.Services.AddScoped<IUserContextHelper, UserContextHelper>();
 builder.Services.AddScoped<IProjectService, ProjectService>();
 
@@ -76,6 +81,7 @@ builder.Services.AddSwaggerGen(
 );
 
 var app = builder.Build();
+app.UseAuthorization();
 
 // Configure the HTTP request pipeline.
 if (app.Environment.IsDevelopment())
@@ -88,8 +94,6 @@ if (app.Environment.IsDevelopment())
 app.MapIdentityApi<User>();
 
 app.UseHttpsRedirection();
-
-app.UseAuthorization();
 
 app.MapControllers();
 

@@ -2,7 +2,7 @@ namespace PmsApi.DTOs;
 
 public record UserDto
 (
-    string Id,
+    string UserId,
 
     string UserName,
 

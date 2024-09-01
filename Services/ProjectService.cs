@@ -8,15 +8,15 @@ namespace PmsApi.Services;
 
 public class ProjectService : IProjectService
 {
-    private readonly IUserContextHelper _userContextHelper;
     private readonly PmsapiContext _context;
     private readonly IMapper _mapper;
+    private readonly IUserContextHelper _userContextHelper;
 
-    public ProjectService(IUserContextHelper userContextHelper, PmsapiContext context, IMapper mapper)
+    public ProjectService(PmsapiContext context, IMapper mapper, IUserContextHelper userContextHelper)
     {
-        _userContextHelper = userContextHelper;
         _context = context;
         _mapper = mapper;
+        _userContextHelper = userContextHelper;
     }
     public async Task<ProjectWithTaskDto?> GetProjectTasksAsync(int projectId, string userId, bool isAdmin)
     {
@@ -27,7 +27,8 @@ public class ProjectService : IProjectService
             projectsQuery = projectsQuery.Where(p => p.UsersManagerId == userId);
         }
 
-        var project = await projectsQuery.Include(p => p.Tasks).FirstOrDefaultAsync(p => p.ProjectId == projectId);
+        var project = await projectsQuery.Include(p => p.Tasks)
+        .FirstOrDefaultAsync(p => p.ProjectId == projectId);
 
         if (project == null)
         {
