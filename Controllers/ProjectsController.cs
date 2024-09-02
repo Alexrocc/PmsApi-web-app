@@ -5,7 +5,6 @@ using Microsoft.EntityFrameworkCore;
 using MySqlConnector;
 using PmsApi.DataContexts;
 using PmsApi.DTOs;
-using PmsApi.Models;
 using PmsApi.Services;
 using PmsApi.Utilities;
 
@@ -32,24 +31,17 @@ public class ProjectsController : ControllerBase
     [HttpGet]
     public async Task<ActionResult<IEnumerable<ProjectWithTaskDto>>> GetProjects([FromQuery] string include = "")
     {
-        var projectsQuery = QueryHelper.ApplyProjectIncludes(_context.Projects.AsQueryable(), include);
+        GetUserCredentials(out string userId, out bool isAdmin);
 
-        if (!_userContextHelper.IsAdmin())
-        {
-            projectsQuery.Where(p => p.UsersManagerId == _userContextHelper.GetUserId());
-        }
-
-        var projects = await projectsQuery.ToListAsync();
-        var projectsDto = _mapper.Map<IEnumerable<ProjectWithTaskDto>>(projects);
+        var projectsDto = await _projectService.GetProjectsAsync(userId, isAdmin, include);
 
         return Ok(projectsDto);
     }
 
     [HttpGet("{projectId}/tasks")]
-    public async Task<ActionResult<IEnumerable<ProjectWithTaskDto>>> GetProjectTasks(int projectId)
+    public async Task<ActionResult<ProjectWithTaskDto>> GetProjectTasks(int projectId)
     {
-        var userId = _userContextHelper.GetUserId();
-        var isAdmin = _userContextHelper.IsAdmin();
+        GetUserCredentials(out string userId, out bool isAdmin);
 
         var projectTasks = await _projectService.GetProjectTasksAsync(projectId, userId, isAdmin);
         if (projectTasks == null)
@@ -62,12 +54,12 @@ public class ProjectsController : ControllerBase
     [HttpGet("{projectId:int}")]
     public async Task<ActionResult<ProjectWithTaskDto>> GetProject([FromRoute] int projectId, [FromQuery] string include = "")
     {
-        var projectsQuery = QueryHelper.ApplyProjectIncludes(_context.Projects.AsQueryable(), include);
+        GetUserCredentials(out string userId, out bool isAdmin);
 
-        Project? project = await projectsQuery.FirstOrDefaultAsync(p => p.ProjectId == projectId);
+        var project = await _projectService.GetProjectAsync(projectId, userId, isAdmin, include);
         if (project is null)
         {
-            return NotFound();
+            return NotFound($"Project with ID {projectId} not found.");
         }
         var projectDto = _mapper.Map<ProjectWithTaskDto>(project);
         return Ok(projectDto);
@@ -76,26 +68,18 @@ public class ProjectsController : ControllerBase
     [HttpPost]
     public async Task<ActionResult> CreateProject(CreateProjectDto projectDto)
     {
-
         if (!ModelState.IsValid)
         {
             return BadRequest(ModelState);
         }
 
-        if (!_userContextHelper.IsAdmin())
-        {
-            projectDto.UsersManagerId = _userContextHelper.GetUserId();
-        }
+        GetUserCredentials(out string userId, out bool isAdmin);
 
-        var project = _mapper.Map<Project>(projectDto);
-
-        _context.Projects.Add(project);
         try
         {
-            await _context.SaveChangesAsync();
-            var newProjectDto = _mapper.Map<ProjectDto>(project);
+            var newProjectDto = await _projectService.CreateProjectAsync(projectDto, userId, isAdmin);
             // api/projects/{newId} ---> CreatedAtAction() returns the new URL for the resource
-            return CreatedAtAction(nameof(GetProject), new { projectId = project.ProjectId }, newProjectDto);
+            return CreatedAtAction(nameof(GetProject), new { projectId = newProjectDto.ProjectId }, newProjectDto);
         }
         catch (DbUpdateException ex)
         when (ex.InnerException is MySqlException mySqlException
@@ -116,33 +100,19 @@ public class ProjectsController : ControllerBase
         {
             return BadRequest(ModelState);
         }
-
-        Project? project = await _context.Projects.FindAsync(projectId);
-
-        if (project is null)
-        {
-            return NotFound($"The project with the ID {projectId} could not be found.");
-        }
-        if (!_userContextHelper.IsAdmin() && project.UsersManagerId != _userContextHelper.GetUserId())
-        {
-            return Unauthorized();
-        }
-
-        _mapper.Map(projectDto, project);
-
-        // project.ProjectName = projectDto.ProjectName;
-        // project.Description = projectDto.Description;
-        // project.UsersManagerId = projectDto.UsersManagerId;
-        // project.ProjectCategoriesId = projectDto.ProjectCategoriesId;
-        // project.StatusId = projectDto.StatusId;
-        // project.PriorityId = projectDto.PriorityId;
-        // project.StartDate = projectDto.StartDate;
-        // project.EndDate = projectDto.EndDate;
+        GetUserCredentials(out string userId, out bool isAdmin);
 
         try
         {
-            await _context.SaveChangesAsync();
-            // api/users/{newId} ---> CreatedAtAction() returns the new URL for the resource
+            var result = await _projectService.UpdateProjectAsync(projectId, projectDto, userId, isAdmin);
+            if (result is null)
+            {
+                return NotFound();
+            }
+            if (result is false)
+            {
+                return StatusCode(500, "An internal error has occurred.");
+            }
             return Ok();
         }
         catch (DbUpdateException ex)
@@ -160,21 +130,17 @@ public class ProjectsController : ControllerBase
     [HttpDelete]
     public async Task<ActionResult> DeleteProject(int projectId)
     {
-        Project? project = await _context.Projects.FindAsync(projectId);
+        GetUserCredentials(out string userId, out bool isAdmin);
 
-        if (project == null)
-        {
-            return NotFound($"No project found with ID {projectId}.");
-        }
-        if (!_userContextHelper.IsAdmin() && project.UsersManagerId != _userContextHelper.GetUserId())
-        {
-            return Unauthorized();
-        }
         try
         {
-            _context.Projects.Remove(project);
-            await _context.SaveChangesAsync();
-            return NoContent();
+            var result = await _projectService.DeleteProjectAsync(projectId, userId, isAdmin);
+            if (result is null)
+            {
+                return NotFound();
+            }
+
+            return Ok();
         }
         catch (DbUpdateException ex)
         when (ex.InnerException is MySqlException)
@@ -185,5 +151,11 @@ public class ProjectsController : ControllerBase
         {
             return StatusCode(500, "An internal error has occoured.");
         }
+    }
+
+    private void GetUserCredentials(out string userId, out bool isAdmin)
+    {
+        userId = _userContextHelper.GetUserId();
+        isAdmin = _userContextHelper.IsAdmin();
     }
 }

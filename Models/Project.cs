@@ -14,6 +14,6 @@ public partial class Project
     public int ProjectCategoriesId { get; set; }
     public string UsersManagerId { get; set; } = "";
     public ProjectCategory? ProjectCategory { get; set; }
-    public ICollection<Models.Task>? Tasks { get; set; }
+    public ICollection<Task>? Tasks { get; set; }
     public required User UsersManager { get; set; }
 }

@@ -11,7 +11,7 @@ using PmsApi.Models;
 namespace PmsApi.Controllers;
 
 [ApiController]                 //needed to define the controller
-[Route("api/users"), Authorize(Roles = "Admin")]  //Roles is a comma-delimited list. There can only be one policy
+[Route("api/users"), Authorize(Roles = "Admin")]  //Roles is a comma-delimited list. There can only be one policy active
 public class UsersController : ControllerBase
 {
     private readonly UserManager<User> _manager;
@@ -43,10 +43,10 @@ public class UsersController : ControllerBase
         return Ok(usersDto);
     }
 
-    [HttpGet("{userId}")]
-    public async Task<ActionResult<User>> GetUser(string userId)
+    [HttpGet("{Id}")]
+    public async Task<ActionResult<User>> GetUser(string Id)
     {
-        User? user = await _manager.FindByIdAsync(userId);
+        User? user = await _manager.FindByIdAsync(Id);
         if (user is null)
         {
             return NotFound();
@@ -88,19 +88,19 @@ public class UsersController : ControllerBase
         }
     }
 
-    [HttpPatch("{userId}")]
-    public async Task<ActionResult> UpdateUser([FromRoute] string userId, [FromBody] UpdateUserDto userDto) //[FromBody] is not necessary for POST and PUT calls, since it is implicitly understood by Entity
+    [HttpPatch("{Id}")]
+    public async Task<ActionResult> UpdateUser([FromRoute] string Id, [FromBody] UpdateUserDto userDto) //[FromBody] is not necessary for POST and PUT calls, since it is implicitly understood by Entity
     {
         if (!ModelState.IsValid)
         {
             return BadRequest(ModelState);
         }
 
-        User? user = await _manager.FindByIdAsync(userId);
+        User? user = await _manager.FindByIdAsync(Id);
 
         if (user is null)
         {
-            return NotFound($"The user with the id {userId} could not be found.");
+            return NotFound($"The user with the id {Id} could not be found.");
         }
 
         _mapper.Map(userDto, user);
@@ -124,13 +124,13 @@ public class UsersController : ControllerBase
     }
 
     [HttpDelete]
-    public async Task<ActionResult> DeleteUser(string userId)
+    public async Task<ActionResult> DeleteUser(string Id)
     {
-        User? user = await _manager.FindByIdAsync(userId);
+        User? user = await _manager.FindByIdAsync(Id);
 
         if (user == null)
         {
-            return NotFound($"Could not find the user with ID {userId}.");
+            return NotFound($"Could not find the user with ID {Id}.");
         }
         try
         {
